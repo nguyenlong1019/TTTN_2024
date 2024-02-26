@@ -31,8 +31,13 @@ SECRET_KEY = 'django-insecure-*-ymue%(gn68=uyi%g(xj5n4iheoffd-(5k5443q)vv&b^j5^x
 # DEBUG = True
 DEBUG = False
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["https://tttn2024-production.up.railway.app/", "tttn2024-production.up.railway.app"]
 
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+CSRF_TRUSTED_ORIGINS = ['https://tttn2024-production.up.railway.app/',"tttn2024-production.up.railway.app"]
 
 # Application definition
 
@@ -58,6 +63,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True 
 
 ROOT_URLCONF = 'eproject.urls'
 
