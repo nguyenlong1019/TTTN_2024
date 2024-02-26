@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'header.html' with title="Quản lý hải trình" %}
+
+<div class="row bg-info-subtle rounded mt-2" style="height: 90%;overflow: hidden;">
+    <div class="col-2 col-sm-3 col-md-2 col-lg-2 col-xl-2 col-xxl-2 p-3 d-flex flex-column justify-content-between">
+        <ul class="w-100 d-flex justify-content-center" style="list-style: none;padding-left: 0;gap: 32px;">
+            <li id="monitor-border" class="border-bottom border-3 border-primary fs-6">
+                <a id="monitor" class="nav-link fw-bolder active text-primary" type="button">Giám sát</a>
+            </li>
+            <li id="playback-border" class="fs-6">
+                <a id="playback" class="nav-link fw-bolder" type="button">Xem lại</a>
+            </li>
+        </ul>
+
+        <!-- Giám sát -->
+        <div id="monitor-view" class="w-100 h-100 mt-2">
+            <div class="mb-3 fs-6">
+                <label class="form-label" for="">Nhập mã tàu:</label>
+                <input type="text" class="form-control" placeholder="BĐ-12312">
+            </div>
+            <div class="mb-3 fs-6">
+                <button class="btn btn-primary" type="button">Tìm kiếm</button>
+            </div>
+            <div class="mb-3 fs-6 bg-body-tertiary p-1 rounded" style="overflow-y: auto;height: 60%;">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                    <label class="form-check-label" for="flexRadioDefault1">
+                      BĐ-21312
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
+                    <label class="form-check-label" for="flexRadioDefault2">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3" checked>
+                    <label class="form-check-label" for="flexRadioDefault3">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault4" checked>
+                    <label class="form-check-label" for="flexRadioDefault4">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault5" checked>
+                    <label class="form-check-label" for="flexRadioDefault5">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault6" checked>
+                    <label class="form-check-label" for="flexRadioDefault6">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault7" checked>
+                    <label class="form-check-label" for="flexRadioDefault7">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault8" checked>
+                    <label class="form-check-label" for="flexRadioDefault8">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault9" checked>
+                    <label class="form-check-label" for="flexRadioDefault9">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault10" checked>
+                    <label class="form-check-label" for="flexRadioDefault10">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault11" checked>
+                    <label class="form-check-label" for="flexRadioDefault11">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault12" checked>
+                    <label class="form-check-label" for="flexRadioDefault12">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault13" checked>
+                    <label class="form-check-label" for="flexRadioDefault13">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault14" checked>
+                    <label class="form-check-label" for="flexRadioDefault14">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault15" checked>
+                    <label class="form-check-label" for="flexRadioDefault15">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault16" checked>
+                    <label class="form-check-label" for="flexRadioDefault16">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault17" checked>
+                    <label class="form-check-label" for="flexRadioDefault17">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault18" checked>
+                    <label class="form-check-label" for="flexRadioDefault18">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault19" checked>
+                    <label class="form-check-label" for="flexRadioDefault19">
+                      BĐ-12345
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault20" checked>
+                    <label class="form-check-label" for="flexRadioDefault20">
+                      BĐ-12345
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Xem lại -->
+        <div id="playback-view" class="w-100 h-100 mt-2 d-none">
+            <div class="mb-3 fs-6 row">
+                <label for="" class="form-label col">Chọn tàu:</label>
+                <input type="text" class="form-control col" placeholder="">
+            </div>
+            <div class="mb-3 fs-6 row">
+                <label for="" class="form-label col">Từ ngày:</label>
+                <input type="date" class="form-control col" placeholder="">
+            </div>
+            <div class="mb-3 fs-6 row">
+                <label for="" class="form-label col">Đến ngày:</label>
+                <input type="date" class="form-control col" placeholder="">
+            </div>
+            <div class="mb-3 fs-6">
+                <button class="btn btn-primary" type="button">Tìm kiếm</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-10 rounded">
+        <!-- Map -->
+        <div style="width: 100%;height: 100%;position: relative;" id="map"></div>
+
+        <!-- Legend -->
+        <div id="legend" class="fs-6" style="background-color: white;padding: 12px;margin: 8px;border-radius: 6px;">
+            <p class="fs-6 mb-1">Tổng số tàu: 100</p>
+            <p class="fs-6 mb-1">Đang hoạt động: 97</p>
+            <p class="fs-6 mb-1">Neo: 3</p>
+        </div>
+
+        <script src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initMap&loading=async" defer></script>
+        <script src="{% static 'assets/js/google-map.js' %}"></script>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const monitorTab = document.querySelector('#monitor');
+        const playbackTab = document.querySelector('#playback');
+        const monitorView = document.querySelector('#monitor-view');
+        const playbackView = document.querySelector('#playback-view');
+        const monitorList = document.getElementById('monitor-border');
+        const playbackList = document.getElementById('playback-border');
+
+        monitorTab.addEventListener('click', function() {
+            console.log("Click 1");
+            monitorView.classList.remove('d-none');
+            monitorTab.classList.add('active', 'text-primary');
+            monitorList.classList.add('border-bottom','border-3','text-primary');
+
+            playbackView.classList.add('d-none');
+            playbackTab.classList.remove('active','text-primary');
+            playbackList.classList.remove('border-bottom','border-3','text-primary');
+        });
+
+        playbackTab.addEventListener('click', function() {
+            console.log("Click 2");
+            monitorView.classList.add('d-none');
+            monitorTab.classList.remove('active', 'text-primary');
+            monitorList.classList.remove('border-bottom','border-3','text-primary');
+
+            playbackView.classList.remove('d-none');
+            playbackTab.classList.add('active','text-primary');
+            playbackList.classList.add('border-bottom','border-3','text-primary');
+        });
+    });
+</script>
+
+{% endblock content %}

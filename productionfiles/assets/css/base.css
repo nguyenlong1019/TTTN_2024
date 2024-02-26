@@ -1,0 +1,21 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nunito', sans-serif;
+}
+.container-fluid {
+    padding: 0;
+    margin: 0;
+}
+.container-fluid.wrapper {
+    display: flex;
+    gap: 0;
+}
+.main {
+    width: calc(100% - 140px);
+    height: 100vh;
+    background-color: transparent;
+    /* margin: 0 12px; */
+    padding: 0 12px;
+}

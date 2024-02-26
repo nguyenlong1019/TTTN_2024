@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'header.html' with title="Quản lý thiết bị" %}
+
+{% include 'header-control.html' with first_id="" second_id="" %}
+
+{% csrf_token %}
+<form action="">
+    <div class="row bg-info-subtle pe-2 fs-6">
+        <div class="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+            <input type="text" class="form-control" id="" placeholder="Nhập mã tàu..." required>
+        </div>
+        <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+            <select type="text" class="form-select form-select-sm" id="">
+                <option value="1">IMO</option>
+                <option value="2">Số đăng ký</option>
+                <option value="3">Tên chủ tàu</option>
+                <option value="4">Tên thuyền trưởng</option>
+                <option value="5">Mã thiết bị</option>
+            </select>
+        </div>
+        <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
+            <button class="btn btn-dark rounded">
+                <i class="fa-brands fa-searchengin"></i>
+                <span class='ms-1 fs-6'>Tìm kiếm</span>
+            </button>
+        </div>
+        <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
+            <button class="btn btn-info rounded">
+                <i class="fa-solid fa-arrow-rotate-right"></i>
+                <span class='ms-1 fs-6'>Nhập lại</span>
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="row bg-info-subtle p-2 fs-6 rounded-bottom">
+    <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
+        <button class="btn btn-success rounded">
+            <i class="fa-solid fa-circle-plus"></i>
+            <span class='ms-1 fs-6'>Tạo mới</span>
+        </button>
+    </div>
+    <div class="col-1">
+        
+    </div>
+    <div class="col-2">
+        <select type="text" class="form-select form-select-sm" id="">
+            <option value="1">50 bản ghi</option>
+            <option value="2">100 bản ghi</option>
+            <option value="3">200 bản ghi</option>
+            <option value="4">500 bản ghi</option>
+            <option value="5">Tất cả bản ghi</option>
+        </select>
+    </div>
+    <div class="col-1">
+        <button class="btn btn-primary rounded" style="width: max-content;">
+            <i class="fa-solid fa-download"></i>
+            <span class='ms-1 fs-6'>Tải xuống</span>
+        </button>
+    </div>
+</div>
+
+<div class="row bg-info-subtle rounded p-2 mt-2 fs-6" style="height: 70vh;">
+    <div class="col-12">
+        <table class="table table-hover shadow" style="overflow-y: auto;">
+
+        </table>
+    </div>
+</div>
+
+{% endblock content %}

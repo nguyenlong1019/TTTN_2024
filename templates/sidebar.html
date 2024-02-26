@@ -1,0 +1,68 @@
+{% load static %}
+<aside class="sidebar p-1 d-flex flex-column justify-content-between">
+    <div class="d-flex flex-column align-items-center">
+        <div class="mt-2">
+            <img src="{% static 'assets/imgs/logo.png' %}" class="sidebar-logo img-thumbnai" style="width: 60px;height: 60px;" alt="logo">
+        </div>
+        <hr class="text-white w-75" />
+        <ul class="nav flex-column">
+            
+            
+            <li class="nav-item my-1">
+                <a class="d-flex flex-column align-items-center nav-link text-white fs-5" href="{% url 'journal-view' %}">
+                    <i class="fa-solid fa-book-journal-whills"></i>
+                    <span class="fs-6 mt-2">Nhật Ký</span>
+                </a>
+            </li>
+            <li class="nav-item text-white my-1">
+                <a class="d-flex flex-column align-items-center nav-link text-white fs-5" href="{% url 'report-view' %}">
+                    <i class="fa-solid fa-chart-simple"></i>
+                    <span class="fs-6 mt-2">Báo Cáo</span>
+                </a>
+            </li>
+            <li class="nav-item text-white my-1">
+                <a class="d-flex flex-column align-items-center nav-link text-white fs-5" href="{% url 'index' %}">
+                    <i class="fa-solid fa-ship"></i>
+                    <span class="fs-6 mt-2">Hải Trình</span>
+                </a>
+            </li>
+            <li class="nav-item text-white my-1">
+                <a class="d-flex flex-column align-items-center nav-link text-white fs-5" href="{% url 'device-view' %}">
+                    <i class="fa-solid fa-server"></i>
+                    <span class="fs-6 mt-2">Thiết Bị</span>
+                </a>
+            </li>
+            <li class="nav-item text-white my-1">
+                <a class="d-flex flex-column align-items-center nav-link text-white fs-5" href="{% url 'shipowners-view' %}">
+                    <i class="fa-solid fa-user"></i>
+                    <span class="fs-6 mt-2">Chủ Tàu</span>
+                </a>
+            </li>
+            <li class="nav-item text-white my-1">
+                <a class="d-flex flex-column align-items-center nav-link text-white fs-5" href="{% url 'account-view' %}">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span class="fs-6 mt-2">Tài Khoản</span>
+                </a>
+            </li>
+            
+        </ul>
+
+    </div>
+    <div class="logout-wrapper">
+        <a href="{% url 'logout' %}" class="logout-link">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </a>
+    </div>
+</aside>
+
+<script>
+    const currentUrl = window.location.href;
+    const sidebarLinks = Array.from(document.querySelectorAll('.sidebar .nav-link'));
+
+    sidebarLinks.forEach(link => {
+        const linkUrl = new URL(link.getAttribute('href'), window.location.origin).href;
+        if (currentUrl === linkUrl) {
+            link.classList.add('active');
+        } // không cần else vì sẽ chuyển hướng nên tải lại trang
+    });
+</script>
