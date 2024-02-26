@@ -83,22 +83,22 @@ WSGI_APPLICATION = 'eproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-
 DATABASES = {
-    'default': 'django.db.backends.mysql',
-    'NAME': 'railway',
-    'USER': 'root',
-    'PASSWORD': '14535H3dH6bb16HefcF3E1bHEHdbeG3d',
-    'HOST': 'viaduct.proxy.rlwy.net',
-    'PORT': '45566',
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+
+
+# DATABASES = {
+#     'default': 'django.db.backends.mysql',
+#     'NAME': 'railway',
+#     'USER': 'root',
+#     'PASSWORD': '14535H3dH6bb16HefcF3E1bHEHdbeG3d',
+#     'HOST': 'viaduct.proxy.rlwy.net',
+#     'PORT': '45566',
+# }
 
 
 # Password validation
