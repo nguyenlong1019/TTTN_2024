@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+{% csrf_token %}
+
+{% include 'header.html' with title="Xem lại hải trình" %}
+
+{% if messages %}
+
+{% for message in messages %}
+<div {% if message.tags %} class="alert-{{ message.tags }} alert alert-dismissible"{% endif %} role="alert">
+    <div>{{ message }}</div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+
+{% endif %}
+
+<div class="row bg-info-subtle rounded mt-2" style="height: 90%;overflow: hidden;">
+    <div class="col-2 col-sm-3 col-md-2 col-lg-2 col-xl-2 col-xxl-2 p-3 d-flex flex-column justify-content-between">
+        <ul class="w-100 d-flex justify-content-center" style="list-style: none;padding-left: 0;gap: 32px;">
+            <li id="monitor-border" class="fs-6">
+                <a id="monitor" class="nav-link fw-bolder" href="{% url 'index' %}">Giám sát</a>
+            </li>
+            <li id="playback-border" class="border-bottom border-3 border-primary fs-6">
+                <a id="playback" class="nav-link fw-bolder active text-primary" type="button">Xem lại</a>
+            </li>
+        </ul>
+
+        <!-- Xem lại -->
+        <div id="playback-view" class="w-100 h-100 mt-2">
+            <form action="{% url 'marine-view' %}" method="GET" onsubmit="return validateForm()">
+                <div class="mb-3 fs-6 row">
+                    <label for="select-ship" class="form-label col">Chọn tàu:</label>
+                    <input type="text" class="form-control col" name="q" id="select-ship" data-pk="{{ship.ID}}" value="{{ship.SoDangKy}}" required />
+                </div>
+                <div class="mb-3 fs-6 row">
+                    <label for="start-date" class="form-label col">Từ ngày:</label>
+                    <input type="date" class="form-control col" name="start-date" value="{{start_date}}" id="start-date" required />
+                </div>
+                <div class="mb-3 fs-6 row">
+                    <label for="end-date" class="form-label col">Đến ngày:</label>
+                    <input type="date" class="form-control col" name="end-date" value="{{end_date}}" id="end-date" required />
+                </div>
+                <div class="mb-3 fs-6">
+                    <button class="btn btn-primary" type="submit">Tìm kiếm</button>
+                </div>
+
+                <div id="search-info" class="mb-3 mt-3 fs-6 text-white p-2 rounded" style="background-color: #5F5D9C;">
+                    <p>Thông tin tìm được</p>
+                    <div>
+                        <p>Tàu cá: <strong>{{ship.SoDangKy}}</strong><br></p>
+                        <p>Lat: <strong></strong></p>
+                        <p>Lng: <strong></strong></p>
+                        <p>Date: <strong></strong></p>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <div class="col-10 rounded">
+        <!-- Map -->
+        <div style="width: 100%;height: 100%;position: relative;" id="map"></div>
+
+        <script src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initMap&loading=async" defer></script>
+        <script src="{% static 'assets/js/ship-search-view.js' %}"></script>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const monitorTab = document.querySelector('#monitor');
+        const playbackTab = document.querySelector('#playback');
+        const monitorView = document.querySelector('#monitor-view');
+        const playbackView = document.querySelector('#playback-view');
+        const monitorList = document.getElementById('monitor-border');
+        const playbackList = document.getElementById('playback-border');
+
+        monitorTab.addEventListener('click', function() {
+            // console.log("Click 1");
+            monitorView.classList.remove('d-none');
+            monitorTab.classList.add('active', 'text-primary');
+            monitorList.classList.add('border-bottom','border-3','text-primary','border-primary');
+
+            playbackView.classList.add('d-none');
+            playbackTab.classList.remove('active','text-primary');
+            playbackList.classList.remove('border-bottom','border-3','text-primary','border-primary');
+        });
+
+        playbackTab.addEventListener('click', function() {
+            // console.log("Click 2");
+            monitorView.classList.add('d-none');
+            monitorTab.classList.remove('active', 'text-primary');
+            monitorList.classList.remove('border-bottom','border-3','text-primary','border-primary');
+
+            playbackView.classList.remove('d-none');
+            playbackTab.classList.add('active','text-primary');
+            playbackList.classList.add('border-bottom','border-3','text-primary','border-primary');
+        });
+    });
+</script>
+
+<script>
+    function validateForm() {
+        // lấy giá trị các trường cần kiểm tra
+        let startDate = new Date(document.getElementById('start-date').value);
+        let endDate = new Date(document.getElementById('end-date').value);
+        let today = new Date();
+
+        if (endDate > today) {
+            alert("Ngày kết thúc không được phép là ngày trong tương lai!!");
+            return false;
+        }
+
+        if (startDate >= endDate) {
+            alert("Ngày bắt đầu phải nhỏ hơn ngày kết thúc!")
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+{% endblock content %}

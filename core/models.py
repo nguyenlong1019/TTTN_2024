@@ -129,7 +129,6 @@ class BangChuTau(models.Model):
     MaHuyen = models.ForeignKey(
         BangDonViHanhChinhCapHuyen, 
         on_delete=models.DO_NOTHING, # NO ACTION
-        editable=False, # NO UPDATE
         null=False,
         default=1
     )
@@ -138,7 +137,7 @@ class BangChuTau(models.Model):
         verbose_name_plural = "Bảng chủ tàu"
 
     def __str__(self):
-        return f"{self.IDChuTau}-{self.HoTen}"
+        return f"{self.HoTen}-CMND:{self.CMND_CCCD}-Phone:{self.DienThoai}"
 
 
 class BangThuyenTruong(models.Model):
@@ -200,16 +199,16 @@ class BangThuyenTruong(models.Model):
     MaHuyen = models.ForeignKey(
         BangDonViHanhChinhCapHuyen,
         on_delete=models.DO_NOTHING,
-        editable=False,
         null=False,
         default=1
     )
+    hasShip = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "Bảng thuyền trưởng"
 
     def __str__(self):
-        return f"{self.IDThuyenTruong}-{self.HoTen}"
+        return f"{self.HoTen}-CMND:{self.CMND_CCCD}-Phone:{self.DienThoai}"
 
 
 class BangCangCa(models.Model):
@@ -331,7 +330,7 @@ class BangThietBiNhatKyKhaiThac(models.Model):
     FWVersion = models.CharField(max_length=10, null=False, 
         default='', help_text='Version Firmware')
 
-    # is_active
+    is_active = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "Bảng thiết bị nhật ký khai thác"
@@ -404,7 +403,6 @@ class BangTau(models.Model):
     NoiDangKy = models.ForeignKey(
         BangDonViHanhChinhCapTinh,
         on_delete=models.DO_NOTHING,
-        editable=False,
         null=False,
         default=1
     )
@@ -493,22 +491,22 @@ class BangTau(models.Model):
     IDDevice = models.OneToOneField(
         BangThietBiNhatKyKhaiThac,
         on_delete=models.DO_NOTHING,
-        null=False, 
-        default=1
+        null=True, 
+        blank=True
     )  
     # tham chiếu đến bảng chủ tàu
     IDChuTau = models.ForeignKey(
         BangChuTau,
         on_delete=models.DO_NOTHING,
-        null=False,
-        default=1
+        related_name='bangtau_chutau',
+        null=True, blank=True,
     )  
     # tham chiếu đến bảng thuyền trưởng
     IDThuyenTruong = models.OneToOneField(
         BangThuyenTruong,
         on_delete=models.DO_NOTHING,
-        null=False,
-        default=1
+        null=True,
+        blank=True
     )
     # tham chiếu đến tỉnh
     IDTinh = models.ForeignKey(
@@ -525,7 +523,7 @@ class BangTau(models.Model):
         verbose_name_plural = "Bảng tàu"
 
     def __str__(self):
-        return f"{self.ID}-{self.SoDangKy}-{self.IDChuTau.HoTen}"
+        return f"{self.ID}-{self.SoDangKy}-{self.IDChuTau.HoTen}-{self.CangCaDangKy.Ten}"
 
 
 class BangLoaiCaDanhBat(models.Model):
@@ -542,7 +540,6 @@ class BangLoaiCaDanhBat(models.Model):
         null=False,
         default='',
         unique=True,
-        editable=False,
         help_text='Mã định danh của loại cá'
     )
     Ten = models.CharField(max_length=128, null=False, 
@@ -667,6 +664,8 @@ class BangChuyenBien(models.Model):
         default=1,
         related_name='cangxuatben'
     )
+    ViDoDi = models.DecimalField(decimal_places=6, max_digits=12, null=True, blank=True)
+    KinhDoDi = models.DecimalField(decimal_places=6, max_digits=12, null=True, blank=True)
     VungBienDanhBat = models.ForeignKey(
         BangVungBienDanhBat,
         on_delete=models.DO_NOTHING,
@@ -684,6 +683,8 @@ class BangChuyenBien(models.Model):
     ], default=date(1900, 1, 1), help_text='Ngày về bến')
     CangVeBen = models.ForeignKey(BangCangCa, on_delete=models.DO_NOTHING, 
         default=1, help_text='Mã cảng về bến', related_name='cangveben') # tham chiếu đến bảng cảng cá
+    ViDoDi = models.DecimalField(decimal_places=6, max_digits=12, null=True, blank=True)
+    KinhDoDi = models.DecimalField(decimal_places=6, max_digits=12, null=True, blank=True)
     KhoiLuongChuyenTai = models.IntegerField(null=True, 
         blank=True, help_text='Khối lượng chuyến tải')
     # chuyến biển của tàu nào
@@ -698,7 +699,7 @@ class BangChuyenBien(models.Model):
         verbose_name_plural = "Bảng chuyến biển"
 
     def __str__(self):
-        return f"{self.ID}-{self.IDTau.SoDangKy}-{self.ChuyenBienSo}"
+        return f"{self.ID}-{self.IDTau.SoDangKy}-Chuyến biển: {self.ChuyenBienSo}-Khối lượng: {self.KhoiLuongChuyenTai}"
 
 
 class BangMeLuoi(models.Model):
@@ -733,30 +734,18 @@ class BangMeLuoi(models.Model):
     )
     STT = models.IntegerField(null=False, default=0, 
         help_text='Số thứ tự của mẻ lưới của chuyến biển')
-    ThoiDiemThaNguCu = models.DateTimeField(null=False,
-        default='01/01/1900 00:00',
-        validators=[
-            MinValueValidator(limit_value='01/01/1900 00:00'),
-            MaxValueValidator(limit_value='31/12/2099 23:59')
-        ]
-    )
+    ThoiDiemThaNguCu = models.DateTimeField()
     # Hoặc sử dụng MaxValue như sau:
     # MaxValueValidator(limit_value=timezone.now().replace(second=0, microsecond=0)),
     ViDoThaNguCu = models.DecimalField(null=False, default=0, max_digits=8,
-        decimal_places=4, help_text='Vĩ độ thả ngư cụ')
+        decimal_places=6, help_text='Vĩ độ thả ngư cụ')
     KinhDoThaNguCu = models.DecimalField(null=False, default=0, max_digits=8,
-        decimal_places=4, help_text='Kinh độ thả ngư cụ')
-    ThoiDiemThuNguCu = models.DateTimeField(null=False,
-        default='01/01/1900 00:00',
-        validators=[
-            MinValueValidator(limit_value='01/01/1900 00:00'),
-            MaxValueValidator(limit_value='31/12/2099 23:59')
-        ]
-    )
+        decimal_places=6, help_text='Kinh độ thả ngư cụ')
+    ThoiDiemThuNguCu = models.DateTimeField()
     ViDoThuNguCu = models.DecimalField(max_digits=8, null=False, default=0, 
-        decimal_places=4, help_text='Vĩ độ thu ngư cụ')
+        decimal_places=6, help_text='Vĩ độ thu ngư cụ')
     KinhDoThuNguCu = models.DecimalField(max_digits=8, null=False, default=0, 
-        decimal_places=4, help_text='Kinh độ thu ngư cụ')
+        decimal_places=6, help_text='Kinh độ thu ngư cụ')
     TongSanLuong = models.IntegerField(null=False, 
         default=0, help_text='Tổng sản lượng của mẻ lưới')
 
@@ -764,7 +753,7 @@ class BangMeLuoi(models.Model):
         verbose_name_plural = "Bảng mẻ lưới"
 
     def __str__(self):
-        return f"{self.ID}-{self.IDMeLuoi}"
+        return f"{self.ID}-Tàu: {self.IDChuyenBien.IDTau.SoDangKy}-Chuyến biển: {self.IDChuyenBien.ChuyenBienSo}-{self.IDChuyenBien.KhoiLuongChuyenTai}-Mẻ lưới: {self.STT}-Sản lượng: {self.TongSanLuong}"
 
 
 class BangLoaiCaDuocDanhBatTrongMeLuoi(models.Model):
@@ -799,10 +788,10 @@ class BangLoaiCaDuocDanhBatTrongMeLuoi(models.Model):
         default=0, help_text='Sản lượng loại cá được đánh bắt trong mẻ lưới')
 
     class Meta:
-        verbose_name_plural = "Bảng loại cá được đánh bắt"
+        verbose_name_plural = "Bảng loại cá đánh bắt được trong mẻ lưới"
 
     def __str__(self):
-        return f"{self.ID}-{self.IDMeLuoi.IDMeLuoi}"
+        return f"{self.ID}-ID mẻ lưới: {self.IDMeLuoi.STT}-Tổng mẻ lưới: {self.IDMeLuoi.TongSanLuong}-Loại cá: {self.IDLoaiCa.Ten}-Sản lượng: {self.SanLuong}"
 
 
 class BangViTriTau(models.Model):
@@ -812,9 +801,11 @@ class BangViTriTau(models.Model):
         on_delete=models.DO_NOTHING,
         default=1,
     )
-    ViDo = models.DecimalField(decimal_places=4, default=0, max_digits=8)
-    KinhDo = models.DecimalField(decimal_places=4, default=0, max_digits=8)
-    Ngay = models.DateTimeField(auto_now_add=True)
+    ViDo = models.DecimalField(decimal_places=6, default=0, max_digits=12)
+    KinhDo = models.DecimalField(decimal_places=6, default=0, max_digits=12)
+    Ngay = models.DateTimeField()
+    TocDo = models.DecimalField(decimal_places=2, default=0, max_digits=12)
+    Huong = models.IntegerField(default=0)
 
     class Meta:
         verbose_name_plural = "Bảng vị trí tàu"
@@ -835,10 +826,12 @@ class BangNhatKy(models.Model):
         on_delete=models.DO_NOTHING,
         default=1
     )
+    MaNhatKy = models.CharField(max_length=24, null=True, blank=True)
+    NgayTao = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name_plural = "Bảng nhật ký"
 
     def __str__(self):
-        return f"{self.ID}-{self.IDThietBi.SerialNumber}"
+        return f"{self.ID}-{self.IDThietBi.SoDangKy}"
 

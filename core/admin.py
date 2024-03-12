@@ -21,3 +21,7 @@ admin.site.register(BangMeLuoi)
 admin.site.register(BangLoaiCaDuocDanhBatTrongMeLuoi)
 admin.site.register(BangViTriTau)
 admin.site.register(BangNhatKy)
+
+# admin
+# admin@gmail.com
+# @admin123 

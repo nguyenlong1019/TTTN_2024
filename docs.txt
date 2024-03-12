@@ -1,0 +1,22 @@
+Chủ tàu:
+check email hợp lệ  
+xóa chủ tàu hoặc thuyền trưởng thì set null trong tàu 
+số cmnd và số điện thoại và email là duy nhất, xử lý sâu hơn nữa là check số cmnd và check sđt hợp lệ, 
+
+Phần hải trình:
+chỉ hiển thị lên map các tàu đã có vị trí để chánh lỗi 
+đối với phần quản lý hải trình chỗ giám sát, làm auto completed và bỏ đi button tìm kiếm, fix bug bảng legend không hiển thị 
+tìm kiếm nếu ngày không có lịch sử hải trình thì thông báo cho user 
+
+Phần nhật ký:
+chỉ hiển thị lên danh sách nhật ký mới nhất, nếu search thì mới ra 
+thực hiện các hàm đủ 
+Hoàn thiện phần nhật ký
+
+Phần quản lý thiết bị: sửa ID, STT 
+
+Hoàn thiện phần quản lý tài khoản, phân quyền 
+Click vào avatar cũng có phần logout 
+
+Hoàn thiện phần báo cáo 
+

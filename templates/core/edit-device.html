@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<form method="POST" onsubmit="return validateForm()">
+    {% csrf_token %}
+<div class="row mt-1 mb-2">
+    <div class="d-flex align-items-center justify-content-between">
+        <a href="{% url 'device-view' %}" class="btn btn-primary"><i class="fa-solid fa-arrow-left"></i></a>
+        <h3 class="fs-5 fw-bolder text-capitalize" style="color: #0B60B0;">
+            Sửa thông tin tàu {{item.SoDangKy}}
+        </h3>
+    </div>
+</div>
+
+
+<h4 class="fw-semi fs-6 mt-1">Thông Tin Chung</h4>
+<hr class="text-dark" />
+<div class="bg-info-subtle rounded p-3">
+    <div class="row">
+        <div class="col mb-2">
+            <label for="tenTau" class="form-label">Tên tàu*</label>
+            <input type="text" class="form-control" value="{{item.TenTau}}" name="tenTau" id="tenTau" required>
+        </div>
+        <div class="col mb-2">
+            <label for="chuTau" class="form-label">Chủ tàu*</label>
+            <select name="chuTau" id="chuTau" class="form-select" required>
+                {% for user in shipowners %}
+                    {% if user.HoTen == item.IDChuTau.HoTen and user.CCCD_CMND == item.IDChuTau.CMND_CCCD %}
+                    <option value="{{user.ID}}" selected>{{user.HoTen}}-{{user.CMND_CCCD}}</option>
+                    {% else %}
+                        <option value="{{user.ID}}">{{user.HoTen}}-{{user.CMND_CCCD}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col mb-2">
+            <label for="loaiTau" class="form-label">Loại tàu*</label>
+            <select class="form-select" name="loaiTau" id="loaiTau" required>
+                {% for i in ship_type_list %}
+                    {% if i.IDLoaiTau == item.LoaiTau.IDLoaiTau %}
+                    <option value="{{i.ID}}" selected>{{i.IDLoaiTau}}</option>
+                    {% else %}
+                    <option value="{{i.ID}}">{{i.IDLoaiTau}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col mb-2">
+            <label for="soDangKy" class="form-label">Số đăng ký*</label>
+            <input type="text" class="form-control" value="{{item.SoDangKy}}" name="soDangKy" id="soDangKy" required>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col mb-2">
+            <label for="hoHieu" class="form-label">Hô hiệu*</label>
+            <input type="text" class="form-control" value="{{item.HoHieu}}" name="hoHieu" id="hoHieu" required>
+        </div>
+        <div class="col mb-2">
+            <label for="coHieu" class="form-label">Cờ hiệu</label>
+            <input type="text" class="form-control" value="{{item.CoHieu}}" name="coHieu" id="coHieu">
+        </div>
+        <div class="col mb-2">
+            <label for="IMO" class="form-label">IMO*</label>
+            <input type="text" class="form-control" value="{{item.IMO}}" name="IMO" id="IMO" required>
+        </div>
+        <div class="col mb-2">
+            <label for="noiDangKy" class="form-label">Nơi đăng ký*</label>
+            <select name="noiDangKy" id="noiDangKy" class="form-select" required>
+                {% for i in city_list %}
+                    {% if i.MaTinh == item.NoiDangKy.MaTinh %}
+                    <option value="{{i.MaTinh}}" selected>{{i.TenTiengViet}}</option>
+                    {% else %}
+                    <option value="{{i.MaTinh}}">{{i.TenTiengViet}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
+
+<h4 class="fw-semi fs-6 mt-3">Thông Tin Chi Tiết</h4>
+<hr class="text-dark" />
+<div class="bg-info-subtle rounded p-3">
+    <div class="row">
+        <div class="col mb-2">
+            <label for="cangCaDangKy" class="form-label">Cảng cá đăng ký*</label>
+            <select class="form-select" name="cangCaDangKy" id="cangCaDangKy" required>
+                {% for i in gate_list %}
+                    {% if i.ID == item.CangCaDangKy.ID %}
+                    <option value="{{i.ID}}" selected>{{i.Ten}}</option>
+                    {% else %}
+                    <option value="{{i.ID}}">{{i.Ten}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col mb-2">
+            <label for="cangCaPhu" class="form-label">Cảng cá phụ*</label>
+            <select class="form-select" name="cangCaPhu" id="cangCaPhu" required>
+                {% for i in gate_list %}
+                    {% if i.ID == item.CangCaPhu.ID %}
+                    <option value="{{i.ID}}" selected>{{i.Ten}}</option>
+                    {% else %}
+                    <option value="{{i.ID}}">{{i.Ten}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col mb-2">
+            <label for="ngheChinh" class="form-label">Nghề chính*</label>
+            <select class="form-select" name="ngheChinh" id="ngheChinh" required>
+                {% for i in job_list %}
+                    {% if i.ID == item.NgheChinh.ID %}
+                    <option value="{{i.ID}}" selected>{{i.Ten}}</option>
+                    {% else %}
+                    <option value="{{i.ID}}">{{i.Ten}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col mb-2">
+            <label for="nghePhu1" class="form-label">Nghề phụ 1</label>
+            <select class="form-select" name="nghePhu1" id="nghePhu1">
+                {% for i in job_list %}
+                    {% if i.ID == item.NghePhu1.ID %}
+                    <option value="{{i.ID}}" selected>{{i.Ten}}</option>
+                    {% else %}
+                    <option value="{{i.ID}}">{{i.Ten}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col mb-2">
+            <label for="ngayDangKy" class="form-label">Ngày đăng ký*</label>
+            <input type="date" class="form-control" value="{{item.NgayDangKy|date:"Y-m-d"}}" name="ngayDangKy" id="ngayDangKy" required>
+        </div>
+        <div class="col mb-2">
+            <label for="ngayHetHanDangKy" class="form-label">Ngày hết hạn đăng ký*</label>
+            <input type="date" class="form-control" value="{{item.NgayHetHanDangKy|date:"Y-m-d"}}" name="ngayHetHanDangKy" id="ngayHetHanDangKy" required>
+        </div>
+        <div class="col mb-2">
+            <label for="ngaySanXuatTau" class="form-label">Ngày sản xuất tàu*</label>
+            <input type="date" class="form-control" value="{{item.NgaySanXuat|date:"Y-m-d"}}" name="ngaySanXuatTau" id="ngaySanXuatTau" required>
+        </div>
+        <div class="col mb-2">
+            <label for="ngayHetHanSuDung" class="form-label">Ngày hết hạn sử dụng tàu*</label>
+            <input type="date" class="form-control" value="{{item.NgayHetHan|date:"Y-m-d"}}" name="ngayHetHanSuDung" id="ngayHetHanSuDung" required>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col mb-2">
+            <label for="maThietBi" class="form-label">Mã thiết bị*</label>
+            <select name="maThietBi" id="maThietBi" class="form-select" required>
+                <option value="{{item.IDDevice.ID}}" selected>{{item.IDDevice.SerialNumber}}</option>
+                {% for i in device_list %}
+                    <option value="{{i.ID}}">{{i.SerialNumber}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col mb-2">
+            <label for="thuyenTruong" class="form-label">Thuyền trưởng*</label>
+            <select name="thuyenTruong" id="thuyenTruong" class="form-select" required>
+                <option value="{{item.IDThuyenTruong.ID}}">{{item.IDThuyenTruong.HoTen}}-{{item.IDThuyenTruong.CMND_CCCD}}</option>
+                {% for i in captain_list %}
+                    <option value="{{i.ID}}">{{i.HoTen}}-{{i.CMND_CCCD}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col mb-2">
+            <label for="tinhThanhPho" class="form-label">Tỉnh*</label>
+            <select name="tinhThanhPho" id="tinhThanhPho" class="form-select" required>
+                {% for i in city_list %}
+                    {% if i.MaTinh == item.Tinh.MaTinh %}
+                    <option value="{{i.MaTinh}}" selected>{{i.TenTiengViet}}</option>
+                    {% else %}
+                    <option value="{{i.MaTinh}}">{{i.TenTiengViet}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col mb-2">
+            <label for="soLuongThuyenVien" class="form-label">Số lượng thuyền viên*</label>
+            <input type="number" min="0" max="1000000" step="1" class="form-control" value="{{item.SoThuyenVien}}" name="soLuongThuyenVien" id="soLuongThuyenVien" required>
+        </div>
+    </div>
+</div>
+
+<h4 class="fw-semi fs-6 mt-3">Thông Số Kỹ Thuật</h4>
+<hr class="text-dark" />
+<div class="bg-info-subtle rounded p-3">
+    <div class="row">
+        <div class="col mb-2">
+            <label for="tongTaiTrong" class="form-label">Tổng tải trọng*</label>
+            <input type="number" min="1" max="1000000" step="0.01" class="form-control" value="{{item.TongTaiTrong}}" name="tongTaiTrong" id="tongTaiTrong" required>
+        </div>
+        <div class="col mb-2">
+            <label for="chieuDaiLonNhat" class="form-label">Chiều dài lớn nhất*</label>
+            <input type="number" min="1" max="1000000" step="0.01" class="form-control" value="{{item.ChieuDaiLonNhat}}" name="chieuDaiLonNhat" id="chieuDaiLonNhat" required>
+        </div>
+        <div class="col mb-2">
+            <label for="chieuRongLonNhat" class="form-label">Chiều rộng lớn nhất*</label>
+            <input type="number" min="1" max="1000000" step="0.01" class="form-control" value="{{item.ChieuRongLonNhat}}" name="chieuRongLonNhat" id="chieuRongLonNhat" required>
+        </div>
+        <div class="col mb-2">
+            <label for="congSuatMay" class="form-label">Công suất máy*</label>
+            <input type="number" min="1" max="1000000" step="0.01" class="form-control" value="{{item.CongSuatMay}}" name="congSuatMay" id="congSuatMay" required>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col mb-2">
+            <label for="monNuoc" class="form-label">Mớn nước*</label>
+            <input type="number" min="1" max="1000000" step="0.01" class="form-control" value="{{item.MonNuoc}}" name="monNuoc" id="monNuoc" required>
+        </div>
+        <div class="col mb-2">
+            <label for="dungTichHamCa" class="form-label">Dung tích hầm cá*</label>
+            <input type="number" min="1" max="1000000" step="0.01" class="form-control" value="{{item.DungTichHamCa}}" name="dungTichHamCa" id="dungTichHamCa" required>
+        </div>
+        <div class="col mb-2">
+            <label for="vanTocDanhBat" class="form-label">Vận tốc đánh bắt*</label>
+            <input type="number" min="1" max="1000000" step="0.01" class="form-control" value="{{item.VanTocDanhBat}}" name="vanTocDanhBat" id="vanTocDanhBat" required>
+        </div>
+        <div class="col mb-2">
+            <label for="vanTocHanhTrinh" class="form-label">Vận tốc hành trình*</label>
+            <input type="number" min="1" max="1000000" step="0.01" class="form-control" value="{{item.VanTocHanhTrinh}}" name="vanTocHanhTrinh" id="vanTocHanhTrinh" required>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col mb-2 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+            <label for="thongSoNguCu" class="form-label">Thông số ngư cụ*</label>
+            <input type="text" class="form-control" value="{{item.ThongSoNguCu}}" name="thongSoNguCu" id="thongSoNguCu" required>
+        </div>
+    </div>
+</div>
+<div class="rounded mt-3">
+    <div class="row">
+        <div class="col">
+            <a href="{% url 'device-view' %}" class="btn btn-dark">Hủy</a>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+        </div>
+    </div>
+</div>
+</form>
+{% endblock content %}

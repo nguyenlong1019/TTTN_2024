@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+{% if message %}
+<div class="alert alert-warning alert-dismissible mt-2 mb-2" role="alert">
+    <div>{{message}}</div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+
+<div class="row mt-1 mb-2">
+    <div class="d-flex align-items-center justify-content-between">
+        <a href="{% url 'shipowners-view' %}" class="btn btn-primary"><i class="fa-solid fa-arrow-left"></i></a>
+        <h3 class="fs-5 fw-bolder text-capitalize" style="color: #0B60B0;">
+            Thêm thông tin chủ tàu/thuyền trưởng
+        </h3>
+    </div>
+</div>
+
+<!-- <h4 class="fw-semi fs-6 mt-1">Thông Tin Chung</h4> -->
+<hr class="text-dark" />
+<div class="bg-info-subtle rounded p-3">
+    <div class="row">
+        <div class="col mb-2">
+            <label for="hoTen" class="form-label">Họ Tên*</label>
+            <input name="hoTen" id="hoTen" type="text" class="form-control" required>
+        </div>
+        <div class="col mb-2">
+            <label for="chucDanh" class="form-label">Chức danh*</label>
+            <select name="chucDanh" id="chucDanh" class="form-select" required>
+                <option value="1">Chủ tàu</option>
+                <option value="2">Thuyền trưởng</option>
+            </select>
+        </div>
+        <div class="col mb-2">
+            <label for="CMND-CCCD" class="form-label">CMND/CCCD*</label>
+            <input name="CMND-CCCD" id="CMND-CCCD" type="number" class="form-control" required>
+        </div>
+        <div class="col mb-2">
+            <label for="ngaySinh" class="form-label">Ngày sinh*</label>
+            <input name="ngaySinh" id="ngaySinh" type="date" value="2000-01-01" class="form-control" required>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col mb-2">
+            <label for="diaChi" class="form-label">Địa chỉ*</label>
+            <input name="diaChi" id="diaChi" type="text" class="form-control" required>
+        </div>
+        <div class="col mb-2">
+            <label for="dienThoai" class="form-label">Điện thoại*</label>
+            <input name="dienThoai" id="dienThoai" type="number" class="form-control" required>
+        </div>
+        <div class="col mb-2">
+            <label for="fax" class="form-label">Fax</label>
+            <input name="fax" id="fax" type="text" class="form-control">
+        </div>
+        <div class="col mb-2">
+            <label for="email" class="form-label">Email</label>
+            <input name="email" id="email" type="email" class="form-control">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col mb-2 col-sm-13 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+            <label for="maHuyen" class="form-label">Huyện*</label>
+            <select name="maHuyen" id="maHuyen" class="form-select" required>
+                {% for i in distric_list %}
+                    <option value="{{i.MaHuyen}}">{{i.TenHuyen}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="rounded mt-3">
+    <div class="row">
+        <div class="col">
+            <a href="{% url 'shipowners-view' %}" class="btn btn-dark">Hủy</a>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+        </div>
+    </div>
+</div>
+
+</form>
+
+{% endblock content %}

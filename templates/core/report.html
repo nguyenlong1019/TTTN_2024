@@ -5,6 +5,144 @@
 
 {% include 'header.html' with title="Báo cáo thống kê" %}
 
-{% include 'header-control.html' with first_id="" second_id="" %}
+<form action="" method="GET">
+    <div class="row bg-info-subtle mt-2 pt-2 fs-6 fw-bolder rounded-top">
+        <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+            <label for="" class="form-label">Bộ lọc</label>
+        </div>
+        <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+            <label class="form-label">Chọn ngày</label>
+        </div>
+    </div>
+    <div class="row bg-info-subtle pb-2 fs-6 rounded-bottom">
+        <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+            <select type="text" class="form-select form-select-sm" id="">
+                {% for i in fishing_port %}
+                    <option value="{{i.ID}}">{{i.Ten}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+            <input type="date" value="2020-01-01" class="form-control col" placeholder="">
+        </div>
+        <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+            <input type="date" value="2024-01-01" class="form-control col" placeholder="">
+        </div>
+        <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
+            <button class="btn btn-dark rounded">
+                <i class="fa-brands fa-searchengin"></i>
+                <span class='ms-1 fs-6'>Tìm kiếm</span>
+            </button>
+        </div>
+        <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
+            <button class="btn btn-info rounded">
+                <i class="fa-solid fa-eye"></i>
+                <span class='ms-1 fs-6'>Xem trước báo cáo</span>
+            </button>
+        </div>
+    </div>
+</form>
 
+<div class="row bg-info-subtle rounded p-2 mt-2 fs-6" style="height: 75vh;overflow-y: auto;">
+    <div class="col-3 text-white rounded p-3" style="background-color: #5F5D9C;">Thông tin cơ bản trong 24h qua</div>
+    <div class="col-5">
+        <canvas id="reportChart" style="width: 100%;height: 100%;"></canvas>
+    </div>
+    <div class="col-4">
+        <table class="table table-hover shadow" style="overflow-y: auto;">
+            <caption class="text-center caption-top fw-bolder">Danh sách các loại cá đánh bắt được trong 24h</caption>
+            <thead>
+                <tr>
+                    {% for title in titles %}
+                        <th class="bg-primary text-white text-center fw-semi" {% if forloop.first %}style="border-top-left-radius: 6px;"{% endif %} {% if forloop.last %}style="border-top-right-radius: 6px;"{% endif %} scope="col">
+                            {{title}}
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    {% if forloop.counter|divisibleby:2 %}
+                        <tr class="fs-6 bg-info-subtle">
+                            <th class="bg-info-subtle text-dark text-center fw-semi" scope="row">
+                                {{forloop.counter}}
+                            </th>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {{item.IDLoaiCa__Ten}}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {{item.tong_san_luong}}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr class="fs-6 bg-light">
+                            <th class="bg-light text-dark text-center fw-semi" scope="row">
+                                {{forloop.counter}}
+                            </th>
+                            <td class="bg-light text-dark text-center">
+                                {{item.IDLoaiCa__Ten}}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                {{item.tong_san_luong}}
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    fetch('/report/top-10-fishing-qty-on-24h/')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // console.log(data);
+        const bundles = data.bundles;
+        // console.log(bundles);
+        const labels = [];
+        const qty = [];
+        bundles.forEach(item => {
+            // console.log(item.fish_name);
+            labels.push(item.fish_name);
+            // console.log(item.qty);
+            qty.push(parseFloat(item.qty));
+        });
+
+        const ctx = document.getElementById('reportChart');
+  
+        let reportChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+            labels: labels,
+            datasets: [{
+                label: 'Top 10 loại cá đánh bắt nhiều nhất trong 24h',
+                data: qty,
+                borderWidth: 1
+            }]
+            },
+            options: {
+            scales: {
+                y: {
+                beginAtZero: true
+                }
+            }
+            }
+        });
+    })
+    .catch(error => {
+        console.error('There was a problem with your fetch operation: ', error);
+    });
+
+
+
+
+  </script>
 {% endblock content %}
+

@@ -7,4 +7,154 @@
 
 {% include 'header-control.html' with first_id="" second_id="" %}
 
+<form action="" method="POST">
+    <div class="row bg-info-subtle pe-2 fs-6">
+        <div class="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+            <input type="text" class="form-control" id="" placeholder="Nhập tên tài khoản..." required>
+        </div>
+        <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+            <select type="text" class="form-select form-select-sm" id="">
+                <option value="1">Nhà cung cấp thiết bị</option>
+                <option value="2">Người dùng ứng dụng (Android/ios)</option>
+                <option value="3">Quản lý cảng</option>
+                <option value="4">Cơ quan quản lý</option>
+                <option value="7">All</option>
+            </select>
+        </div>
+        <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
+            <button class="btn btn-primary rounded">
+                <i class="fa-brands fa-searchengin"></i>
+                <span class='ms-1 fs-6'>Tìm kiếm</span>
+            </button>
+        </div>
+        <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
+            <button class="btn btn-info rounded">
+                <i class="fa-solid fa-arrow-rotate-right"></i>
+                <span class='ms-1 fs-6'>Nhập lại</span>
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="row bg-info-subtle p-2 fs-6">
+    <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
+        <a href="#" class="btn btn-success rounded">
+            <i class="fa-solid fa-circle-plus"></i>
+            <span class='ms-1 fs-6'>Tạo mới</span>
+        </a>
+    </div>
+</div>
+
+<div class='row bg-info-subtle p-1 fs-6 rounded-bottom'>
+    <div class='col-12'>
+            <span class='ms-1 me-4 fs-6'>* Level1: Admin, chi cục hải quan</span>
+            <span class='ms-1 me-4 fs-6'>* Level2: Quản lý cảng</span>
+            <span class='ms-1 me-4 fs-6'>* Level3: Quản lý thiết bị nhật ký khai thác</span>
+            <span class='ms-1 me-4 fs-6'>* Level4: Chủ tàu, thuyền trưởng</span>
+    </div>
+</div>
+
+<div class="row bg-info-subtle rounded p-2 mt-2 fs-6" style="height: 65vh;overflow-y: auto;">
+    <div class="col-12">
+        <table class="table table-hover shadow" style="overflow-y: auto;">
+            <thead>
+                <tr>
+                    {% for title in titles %}
+                        <th class="bg-primary text-white text-center fw-semi" {% if forloop.first %}style="border-top-left-radius: 6px;"{% endif %} {% if forloop.last %}style="border-top-right-radius: 6px;"{% endif %} scope="col">
+                            {{title}}
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    {% if forloop.counter|divisibleby:2 %}
+                        <tr class="fs-6 bg-info-subtle">
+                            <th class="bg-info-subtle text-dark text-center fw-semi" scope="row">
+                                {{forloop.counter}}
+                            </th>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {{item.HoTen}}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {{item.CMND_CCCD}}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {{item.DiaChi}}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {{item.Email}}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {{item.SoDienThoai}}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {% if item.type == 'captain' %}
+                                    Thuyền trưởng
+                                {% endif %}
+                            
+                                {% if item.type == 'shipowner' %}
+                                    Chủ tàu
+                                {% endif %}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                <a href="#" class="btn btn-secondary">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
+                                <button class="btn btn-danger modal-button">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr class="fs-6 bg-light">
+                            <th class="bg-light text-dark text-center fw-semi" scope="row">
+                                {{forloop.counter}}
+                            </th>
+                            <td class="bg-light text-dark text-center">
+                                {{item.HoTen}}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                {{item.CMND_CCCD}}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                {{item.DiaChi}}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                {{item.Email}}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                {{item.SoDienThoai}}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                {% if item.type == 'captain' %}
+                                    Thuyền trưởng
+                                {% endif %}
+                            
+                                {% if item.type == 'shipowner' %}
+                                    Chủ tàu
+                                {% endif %}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                <a href="#" class="btn btn-secondary">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
+                                <button class="btn btn-danger modal-button">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
 {% endblock content %}

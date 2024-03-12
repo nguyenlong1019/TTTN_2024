@@ -28,8 +28,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-*-ymue%(gn68=uyi%g(xj5n4iheoffd-(5k5443q)vv&b^j5^x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+# DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 # ALLOWED_HOSTS = ["https://tttn2024-production.up.railway.app/", "tttn2024-production.up.railway.app"]
@@ -44,6 +44,7 @@ ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     'corsheaders',
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -64,8 +65,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
-
-CORS_ORIGIN_ALLOW_ALL = True 
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'eproject.urls'
 
@@ -93,21 +93,14 @@ WSGI_APPLICATION = 'eproject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'edb',
+        'USER': 'Admin01',
+        'PASSWORD': 'admin@abc',
+        'HOST': 'nhatkydientu.vn',
+        'PORT': '3306'
     }
 }
-
-
-# DATABASES = {
-#     'default': 'django.db.backends.mysql',
-#     'NAME': 'railway',
-#     'USER': 'root',
-#     'PASSWORD': '14535H3dH6bb16HefcF3E1bHEHdbeG3d',
-#     'HOST': 'viaduct.proxy.rlwy.net',
-#     'PORT': '45566',
-# }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -138,20 +131,33 @@ TIME_ZONE = 'Asia/Ho_Chi_Minh'
 USE_I18N = True
 
 USE_TZ = True
+# USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+STATIC_ROOT = BASE_DIR / 'productionfiles'
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
-STATIC_ROOT = BASE_DIR / 'productionfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+JAZZMIN_SETTINGS = {
+    'site_title': 'E-Journal Admin',
+    'site_header': "SmartRF",
+    'side_brand': 'SmartRF',
+    'site_logo': './assets/imgs/logo.png',
+    'login_logo': './assets/imgs/logo_100.png',
+    'login_logo_dark': './assets/imgs/logo_100.png',
+    'site_logo_classes': 'img-circle img-thumbnail',
+    'site_icon': './favicon.ico',
+    'welcome_sign': "Welcome to Admin Page",
+    'copyright': 'KTMT02 - K15',
+}
 

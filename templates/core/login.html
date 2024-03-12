@@ -44,6 +44,12 @@
                     <div class="mb-3">
                         <label class="mb-2 fs-5" for="password-login">Nhập mật khẩu: </label>
                         <input type="password" class="form-control border-info" name="password" id="password-login"/>
+                        {% if message %}
+                        <div class="alert alert-warning alert-dismissible mt-2 mb-2" role="alert">
+                            <div>{{message}}</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="w-100 d-flex justify-content-center mt-1">
                         <button type="submit" class="btn btn-primary fs-5" style="padding: 8px 32px;">Login</button>

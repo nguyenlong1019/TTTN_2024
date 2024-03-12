@@ -5,6 +5,126 @@
 
 {% include 'header.html' with title="Nhật ký khai thác điện tử" %}
 
+{% if messages %}
+
+    {% for message in messages %}
+    <div {% if message.tags %} class="alert-{{ message.tags }} alert alert-dismissible"{% endif %} role="alert">
+        <div>{{ message }}</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+
+{% endif %}
+
 {% include 'header-control.html' with first_id="" second_id="" %}
+
+<form action="" method="POST">
+    <div class="row bg-info-subtle pb-2 fs-6 rounded-bottom">
+        <div class="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+            <input type="text" class="form-control" id="" placeholder="Nhập mã tàu, mã chủ tàu..." required>
+        </div>
+        <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+            <select type="text" class="form-select form-select-sm" id="">
+                <option value="1">Mã tàu</option>
+                <option value="2">Mã chủ tàu</option>
+                <option value="3">Mã thuyền trưởng</option>
+                <option value="4">Mã nhật ký</option>
+                <option value="5">Mã chuyến biển</option>
+            </select>
+        </div>
+        <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
+            <button class="btn btn-dark rounded">
+                <i class="fa-brands fa-searchengin"></i>
+                <span class='ms-1 fs-6'>Tìm kiếm</span>
+            </button>
+        </div>
+        <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
+            <button class="btn btn-secondary rounded">
+                <i class="fa-solid fa-eye"></i>
+                <span class='ms-1 fs-6'>Các biểu mẫu liên quan khác</span>
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="row bg-info-subtle rounded p-2 mt-2 fs-6" style="height: 75vh;overflow-y: auto;">
+    <div class="col-12">
+        <table class="table table-hover shadow" style="overflow-y: auto;">
+            <thead>
+                <tr>
+                    {% for title in titles %}
+                        <th class="bg-primary text-white text-center fw-semi" {% if forloop.first %}style="border-top-left-radius: 6px;"{% endif %} {% if forloop.last %}style="border-top-right-radius: 6px;"{% endif %} scope="col">
+                            {{title}}
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    {% if forloop.counter|divisibleby:2 %}
+                        <tr class="fs-6 bg-info-subtle">
+                            <th class="bg-info-subtle text-dark text-center fw-semi" scope="row">
+                                {{forloop.counter}}
+                            </th>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {{item.IDThietBi.SoDangKy}}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {{item.NgayTao|date:"d-m-Y"}}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {{item.IDThietBi.IDChuTau.HoTen}}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {{item.IDThietBi.IDChuTau.CMND_CCCD}}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {{item.MaNhatKy}}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                
+                            </td>
+                            
+                            <td class="bg-info-subtle text-dark text-center">
+                                <a href="{% url 'journal_pdf' item.ID %}" class="btn btn-secondary">
+                                    <i class="fa-regular fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr class="fs-6 bg-light">
+                            <th class="bg-light text-dark text-center fw-semi" scope="row">
+                                {{forloop.counter}}
+                            </th>
+                            <td class="bg-light text-dark text-center">
+                                {{item.IDThietBi.SoDangKy}}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                {{item.NgayTao|date:"d-m-Y"}}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                {{item.IDThietBi.IDChuTau.HoTen}}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                {{item.IDThietBi.IDChuTau.CMND_CCCD}}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                {{item.MaNhatKy}}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                <a href="{% url 'journal_pdf' item.ID %}" class="btn btn-secondary">
+                                    <i class="fa-regular fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
 {% endblock content %}

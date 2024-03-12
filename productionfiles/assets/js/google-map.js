@@ -1,8 +1,10 @@
-let markers = [
-    { position: {lat: 13.884421, lng: 110.028847}, title: 'Tàu 1', content: 'Tàu 1' },
-    { position: {lat: 12.605872, lng: 111.199578}, title: 'Tàu 2', content: 'Tàu 2' }, 
-]
-
+// let markers = [
+//     { position: {lat: 13.884421, lng: 110.028847}, title: 'Tàu 1', content: 'Tàu 1' },
+//     { position: {lat: 12.605872, lng: 111.199578}, title: 'Tàu 2', content: 'Tàu 2' }, 
+// ]
+const trackingButton = document.getElementById('monitor');
+const previewButton = document.getElementById('playback');
+const focusInput = document.getElementsByName('flexRadioDefault');
 function initMap() {
     let map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 13.678354, lng: 111.400118}, // tọa độ trung tâm
@@ -89,36 +91,124 @@ function initMap() {
 
     flightPath.setMap(map);
 
-    markers.forEach((marker) => {
-        const newMarker = new google.maps.Marker({
-            position: marker.position,
-            map: map,
-            title: marker.title,
-            icon: {
-                url: '/static/assets/imgs/fishing-boat-resize.png',  // sau nên trả url về từ server
-            },
-        });
+    // console.log("Start");
+    fetch('/api/all-location/')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Có lỗi khi lấy dữ liệu!!');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // console.log(data);
+        const info = data.info;
+        info.forEach(item => {
+            // vĩ độ, kinh độ
+            let position = {lat: parseFloat(item.ViDo), lng: parseFloat(item.KinhDo)};
+            // console.log(position.lat, typeof(position.lat));
+            const newMarker = new google.maps.Marker({
+                position: position,
+                map: map,
+                title: `Tàu ${item.SoDangKy}`,
+                icon: {
+                    url: '/static/assets/imgs/fishing-boat-resize.png',  // sau nên trả url về từ server
+                },
+            });
 
-        const infoWindow = new google.maps.InfoWindow({
-            content: `
-                <div class="p-3">
-                    <h3 class="fs-5">${marker.title}</h3>
-                    <p class="fs-6">${marker.content}</p>
-                    <p class="fs-6">Tàu cá: BĐ-21435</p>
-                    <p class="fs-6">Chủ tàu: Nguyễn Văn Long</p>
-                    <p class="fs-6">Thuyền trưởng: Long</p>
-                    <p class="fs-6">Kinh độ: 12.354343</p>
-                    <p class="fs-6">Vĩ độ: 110.234346</p>
-                </div>
-            `
-        });
+            let ngayCapNhat = new Date(item.NgayCapNhat);
 
-        newMarker.addListener("click", () => {
-            infoWindow.open(map, newMarker);
-        });
+            // Định dạng lại ngày giờ
+            let ngay = ngayCapNhat.getDate();
+            let thang = ngayCapNhat.getMonth() + 1; // Tháng bắt đầu từ 0
+            let nam = ngayCapNhat.getFullYear();
+            let gio = ngayCapNhat.getHours();
+            let phut = ngayCapNhat.getMinutes();
+            let giay = ngayCapNhat.getSeconds();
 
+            // Chuỗi định dạng dễ đọc
+            let ngayCapNhatDinhDang = `${gio}:${phut}:${giay} ngày ${ngay}/${thang}/${nam}`;
+
+            const infoWindow = new google.maps.InfoWindow({
+                content: `
+                    <div class="p-3">
+                        <h3 class="fs-5">Vị trí tàu cá ${item.SoDangKy}</h3>
+                        <p class="fs-6"><strong>Thông tin:</strong> </p>
+                        <p class="fs-6">Tàu cá: ${item.SoDangKy}</p>
+                        <p class="fs-6">Chủ tàu: ${item.ChuTau}</p>
+                        <p class="fs-6">Thuyền trưởng: ${item.ThuyenTruong}</p>
+                        <p class="fs-6">Kinh độ: ${item.KinhDo}</p>
+                        <p class="fs-6">Vĩ độ: ${item.ViDo}</p>
+                        <p class="fs-6">Ngày cập nhật: ${ngayCapNhatDinhDang}</p>
+                    </div>
+                `
+            });
+    
+            newMarker.addListener("click", () => {
+                infoWindow.open(map, newMarker);
+            });
+
+            focusInput.forEach(input => {
+                let SoDangKy = input.getAttribute('data-id');
+                if (SoDangKy == item.SoDangKy) {
+                    input.setAttribute('data-lat', item.ViDo);
+                    input.setAttribute('data-lng', item.KinhDo);
+                }
+            });
+        });
+        
+    })
+    .catch(error => {
+        console.error('There was a problem  with your fetch  operation: ', error);
     });
+    // console.log("End");
 
+    // markers.forEach((marker) => {
+    //     const newMarker = new google.maps.Marker({
+    //         position: marker.position,
+    //         map: map,
+    //         title: marker.title,
+    //         icon: {
+    //             url: '/static/assets/imgs/fishing-boat-resize.png',  // sau nên trả url về từ server
+    //         },
+    //     });
+
+    //     const infoWindow = new google.maps.InfoWindow({
+    //         content: `
+    //             <div class="p-3">
+    //                 <h3 class="fs-5">${marker.title}</h3>
+    //                 <p class="fs-6">${marker.content}</p>
+    //                 <p class="fs-6">Tàu cá: BĐ-21435</p>
+    //                 <p class="fs-6">Chủ tàu: Nguyễn Văn Long</p>
+    //                 <p class="fs-6">Thuyền trưởng: Long</p>
+    //                 <p class="fs-6">Kinh độ: 12.354343</p>
+    //                 <p class="fs-6">Vĩ độ: 110.234346</p>
+    //             </div>
+    //         `
+    //     });
+
+    //     newMarker.addListener("click", () => {
+    //         infoWindow.open(map, newMarker);
+    //     });
+
+    // });
+
+    focusInput.forEach(item => item.addEventListener('change', () => {
+        let lat = parseFloat(item.getAttribute('data-lat'));
+        let lng = parseFloat(item.getAttribute('data-lng'));
+        let LatLng = {lat: lat, lng: lng};
+        // map.panTo(LatLng);
+
+        // Đặt cấp độ zoom mong muốn
+        let zoomOut = 6;
+        let zoomLevel = 10;
+
+        // Di chuyển bản đồ đến vị trí mới và thiết lập cấp độ zoom
+        map.setCenter(LatLng);
+        map.setZoom(zoomOut);
+        setTimeout(() => {
+            map.setZoom(zoomLevel);
+        }, 1000);
+    }));
 
     // Add legend
     const mapLegend = document.getElementById('legend');
