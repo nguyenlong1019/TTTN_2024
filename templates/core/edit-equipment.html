@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<form method="POST" onsubmit="return validateForm()">
+    {% csrf_token %}
+
+<div class="row mt-1 mb-2">
+    <div class="d-flex align-items-center justify-content-between">
+        <a href="{% url 'index' %}" class="btn btn-primary"><i class="fa-solid fa-arrow-left"></i></a>
+        <h3 class="fs-5 fw-bolder text-capitalize" style="color: #0B60B0;">
+            Sửa thông tin thiết bị {{equipment.SerialNumber}}
+        </h3>
+    </div>
+</div>
+
+<!-- <h4 class="fw-semi fs-6 mt-1">Thông Tin Chung</h4> -->
+<hr class="text-dark" />
+<div class="bg-info-subtle rounded p-3">
+    <div class="row">
+        <div class="col mb-2 col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+            <label for="serialNumber" class="form-label">Serial Number*</label>
+            <input name="serialNumber" value="{{equipment.SerialNumber}}" id="serialNumber" type="text" class="form-control" required>
+            <small>**Serial Number phải là giá trị chuỗi duy nhất</small>
+        </div>
+        <div class="col mb-2 col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+            <label for="ngaySanXuat" class="form-label">Ngày sản xuất*</label>
+            <input type="date" class="form-control" value="{{equipment.NgaySanXuat|date:'Y-m-d'}}" name="ngaySanXuat" id="ngaySanXuat" required>
+        </div>
+        <div class="col mb-2 col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+            <label for="FWVersion" class="form-label">FW Version*</label>
+            <input name="FWVersion" id="FWVersion" value="{{equipment.FWVersion}}" min="1.0" max="1000" step="0.0001" type="number" class="form-control" required>
+        </div>
+    </div>
+</div>
+
+<div class="rounded mt-3">
+    <div class="row">
+        <div class="col">
+            <a href="{% url 'index' %}" class="btn btn-dark">Hủy</a>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+        </div>
+    </div>
+</div>
+
+</form>
+
+<script>
+    function validateForm() {
+        let ngaySanXuat = new Date(document.getElementById('ngaySanXuat').value);
+        let today = new Date();
+
+        if (ngaySanXuat > today) {
+            alert('Ngày sản xuất không được phép trong tương lai!!!');
+            return false;
+        }
+        return true;
+    }
+</script>
+
+{% endblock content %}

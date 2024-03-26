@@ -43,8 +43,8 @@ modalBtns.forEach(modalBtn => modalBtn.addEventListener('click', () => {
     modalBody.innerHTML = `
         <strong>Lưu ý</strong>:
         <ul>
-            <li>Xóa thông tin người dùng cũng sẽ không ảnh hưởng thông tin liên quan đến tàu do thuyền trưởng hoặc chủ tàu có liên quan</li>
-            <li>Nếu muốn xóa thông tin tàu liên quan vui lòng đến trang quản lý tàu</li>
+            <li>Chỉ được phép xóa chủ tàu hoặc thuyền trưởng chưa liên kết với tàu</li>
+            <li>Nếu muốn xóa thông tin chủ tàu hoặc thuyền trưởng đã liên kết, cần xóa tàu trước</li>
         </ul>
     `;
 
@@ -59,10 +59,34 @@ modalBtns.forEach(modalBtn => modalBtn.addEventListener('click', () => {
     });
     
     submitModalBtn.addEventListener('click', () => {
-        overlayElem.style.display = 'none';
-        modalElem.classList.remove('show-modal');
+        
+        const requestData = {
+            'userType': userType,
+        }
 
         // xử lý logic xóa thông tin ở đây
+        fetch(`/shipowners/delete/${pk}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+            },
+            body: JSON.stringify(requestData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Lỗi khi gửi yêu cầu!!!");
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+            overlayElem.style.display = 'none';
+            modalElem.classList.remove('show-modal');
+        })
+        .catch(error => {
+            console.error('Lỗi:', error);
+        });
 
         // kiểm tra xem chủ tàu hoặc thuyền trưởng có liên kết đến tàu hay không?
         // nếu có set tại tàu là null

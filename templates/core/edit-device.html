@@ -21,13 +21,18 @@
     <div class="row">
         <div class="col mb-2">
             <label for="tenTau" class="form-label">Tên tàu*</label>
+            {% if request.user.user_type == '2' %}
+            <input type="hidden" class="form-control" value="{{item.TenTau}}" name="tenTau" id="tenTau" disabled>
+            <small>Tên tàu không hiển thị đối với quản lý cảng</small>
+            {% else %}
             <input type="text" class="form-control" value="{{item.TenTau}}" name="tenTau" id="tenTau" required>
+            {% endif %}
         </div>
         <div class="col mb-2">
             <label for="chuTau" class="form-label">Chủ tàu*</label>
             <select name="chuTau" id="chuTau" class="form-select" required>
                 {% for user in shipowners %}
-                    {% if user.HoTen == item.IDChuTau.HoTen and user.CCCD_CMND == item.IDChuTau.CMND_CCCD %}
+                    {% if user.HoTen == item.IDChuTau.HoTen and user.CMND_CCCD == item.IDChuTau.CMND_CCCD %}
                     <option value="{{user.ID}}" selected>{{user.HoTen}}-{{user.CMND_CCCD}}</option>
                     {% else %}
                         <option value="{{user.ID}}">{{user.HoTen}}-{{user.CMND_CCCD}}</option>
@@ -49,7 +54,12 @@
         </div>
         <div class="col mb-2">
             <label for="soDangKy" class="form-label">Số đăng ký*</label>
+            {% if request.user.user_type == '2' %}
+            <input type="hidden" class="form-control" value="{{item.SoDangKy}}" name="soDangKy" id="soDangKy" disabled>
+            <small>Số đăng ký không hiển thị đối với quản lý cảng</small>
+            {% else %}
             <input type="text" class="form-control" value="{{item.SoDangKy}}" name="soDangKy" id="soDangKy" required>
+            {% endif %}
         </div>
     </div>
 
@@ -88,6 +98,9 @@
         <div class="col mb-2">
             <label for="cangCaDangKy" class="form-label">Cảng cá đăng ký*</label>
             <select class="form-select" name="cangCaDangKy" id="cangCaDangKy" required>
+                {% if request.user.user_type == '2' %}
+                    <option value="{{request.user.staff.cangca.ID}}">{{request.user.staff.cangca.Ten}}</option>
+                {% else %}
                 {% for i in gate_list %}
                     {% if i.ID == item.CangCaDangKy.ID %}
                     <option value="{{i.ID}}" selected>{{i.Ten}}</option>
@@ -95,6 +108,7 @@
                     <option value="{{i.ID}}">{{i.Ten}}</option>
                     {% endif %}
                 {% endfor %}
+                {% endif %}
             </select>
         </div>
         <div class="col mb-2">

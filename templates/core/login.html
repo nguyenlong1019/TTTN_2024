@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Ứng dụng nhật ký khai thác điện tử được phát triển bởi trung tâm Công nghệ cao trực thuộc Viện Hàn Lâm Khoa Học Và Công Nghệ Việt Nam">
-    <meta name="copyright" content="Copyright 2024 by Trung Tâm Nghiên Cứu và Phát Triển Công Nghệ Cao - Viện Hàn Lâm Khoa Học và Công Nghệ Việt Nam">
-    <meta name="abstract" content="Trung tâm phát triển Công nghệ cao thuộc Viện Hàn Lâm Khoa Học và Công Nghệ Việt Nam">
+    <meta name="description" content="Ứng dụng nhật ký khai thác điện tử được phát triển bởi Công ty TNHH Công nghệ SmartRF Việt Nam">
+    <meta name="copyright" content="Copyright 2024 by công ty TNHH Công nghệ SmartRF Việt Nam">
+    <meta name="abstract" content="Công ty TNHH Công nghệ SmartRF Việt Nam">
     <meta name="distribution" content="Global">
     <meta name="author" content="KTMT 02 - K15 - HaUI">
 
@@ -27,11 +27,67 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
 
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
 
 </head>
-<body>
-    <div class="container-fluid" style="background-color: #E4E9FD; background-image: -webkit-linear-gradient(65deg, #A683E3 50%, #E4E9FD 50%);font-family: 'Nunito' sans-serif;">
+<style>
+    body {
+        font-family: "Montserrat", sans-serif;
+    }
+</style>
+<body style="box-sizing: border-box;">
+    <div class="container-fluid w-100 h-100">
+        <div class="row" style="height: 100vh;">
+            <div class="col-7 col-sm-7 col-md-7 col-lg-7 col-xl-7 col-xxl-7 pt-2 d-flex flex-column justify-content-between">
+                <nav class="d-flex align-items-center justify-content-start" style="gap: 0 24px;">
+                    <img src="{% static './assets/imgs/logoSmartRf 3.png' %}" alt="logo-smartRF">
+                    <h4>Công ty TNHH Công Nghệ SmartRF Việt Nam</h4>
+                </nav>
+                <div>
+                    <h1 class="text-center" style="font-weight: 800;color: red;">ĐĂNG NHẬP</h1>
+                    <form class="mt-3 w-50 m-auto" method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="mb-2 fs-5" for="username-login">Tài khoản: </label>
+                            <input type="text" class="form-control border-info" name="username" id="username-login"/>
+                        </div>
+                        <div class="mb-3">
+                            <label class="mb-2 fs-5" for="password-login">Mật khẩu: </label>
+                            <input type="password" class="form-control border-info" name="password" id="password-login"/>
+                            {% if message %}
+                            <div class="alert alert-warning alert-dismissible mt-2 mb-2" role="alert">
+                                <div>{{message}}</div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="w-100 d-flex justify-content-center mt-1">
+                            <button type="submit" class="btn btn-success fs-5" style="padding: 8px 32px;">Đăng nhập</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="text-center">
+                    <p>Copyright ©️ 2023</p>
+                    <p>Công ty TNHH Công Nghệ SmartRF Việt Nam</p>
+                </div>
+            </div>
+            <div class="col-5 col-sm-5 col-md-5 col-lg-5 col-xl-5 col-xxl-5 d-flex align-items-center justify-content-center" style="background-color: #EAFFF0;">
+                <div class="d-flex flex-column" style="gap: 32px 0;">
+                    <img class="img-thumbnail border-0 outline-0 m-auto" style="background-color: #EAFFF0;width: 12em;height: 12em;" src="{% static './assets/imgs/image66.png' %}" alt="e-diary">
+                    <h3 class="text-center">NHẬT KÝ KHAI THÁC <br/>THỦY SẢN ĐIỆN TỬ</h3>
+                    <ul>
+                        <li>Lưu trữ, quản lý nhật ký điện tử</li>
+                        <li>Định vị, giám sát tàu cá</li>
+                        <li>Xuất báo cáo thống kê sản lượng khai thác</li>
+                        <li>Mã hóa dữ liệu đảm bảo an toàn</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="container-fluid" style="background-color: #E4E9FD; background-image: -webkit-linear-gradient(65deg, #A683E3 50%, #E4E9FD 50%);font-family: 'Nunito' sans-serif;">
         <div class="container d-flex justify-content-center align-items-center w-100" style="height: 100vh;">
             <div id="login-layout" class="p-5 rounded border bg-light" style="box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);">
                 <h3 class="mb-3 pb-2 text-center" style="color: #007bff;font-weight: 800;font-family: 'Quicksand', sans-serif;text-transform: uppercase;font-size: 40px;" >Nhật ký điện tử</h3>
@@ -57,7 +113,7 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div> -->
     
 
     <!-- Bootstrap 5 -->

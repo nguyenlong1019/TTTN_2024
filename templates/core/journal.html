@@ -16,18 +16,20 @@
 
 {% endif %}
 
-{% include 'header-control.html' with first_id="" second_id="" %}
+{% include 'header-control.html' with first_id="journal-search-input" second_id="journal-search-select" %}
 
-<form action="" method="POST">
+<form action="{% url 'search-journal' %}" method="GET">
     <div class="row bg-info-subtle pb-2 fs-6 rounded-bottom">
         <div class="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
-            <input type="text" class="form-control" id="" placeholder="Nhập mã tàu, mã chủ tàu..." required>
+            <input type="text" class="form-control" name="q" id="journal-search-input" placeholder="Nhập mã tàu, mã chủ tàu..." required>
         </div>
         <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
-            <select type="text" class="form-select form-select-sm" id="">
+            <select type="text" name="query-type" class="form-select form-select-sm" id="journal-search-select">
+                {% if request.user.user_type == '1' or request.user.is_staff %}
                 <option value="1">Mã tàu</option>
-                <option value="2">Mã chủ tàu</option>
-                <option value="3">Mã thuyền trưởng</option>
+                {% endif %}
+                <!-- <option value="2">Mã chủ tàu</option>
+                <option value="3">Mã thuyền trưởng</option> -->
                 <option value="4">Mã nhật ký</option>
                 <option value="5">Mã chuyến biển</option>
             </select>
@@ -39,10 +41,10 @@
             </button>
         </div>
         <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
-            <button class="btn btn-secondary rounded">
+            <!-- <button class="btn btn-secondary rounded">
                 <i class="fa-solid fa-eye"></i>
                 <span class='ms-1 fs-6'>Các biểu mẫu liên quan khác</span>
-            </button>
+            </button> -->
         </div>
     </div>
 </form>
@@ -67,7 +69,11 @@
                                 {{forloop.counter}}
                             </th>
                             <td class="bg-info-subtle text-dark text-center">
+                                {% if request.user.user_type == '1' or request.user.is_staff %}
                                 {{item.IDThietBi.SoDangKy}}
+                                {% else %}
+                                ********
+                                {% endif %}
                             </td>
                             <td class="bg-info-subtle text-dark text-center">
                                 {{item.NgayTao|date:"d-m-Y"}}
@@ -97,7 +103,11 @@
                                 {{forloop.counter}}
                             </th>
                             <td class="bg-light text-dark text-center">
+                                {% if request.user.user_type == '1' or request.user.is_staff %}
                                 {{item.IDThietBi.SoDangKy}}
+                                {% else %}
+                                ********
+                                {% endif %}
                             </td>
                             <td class="bg-light text-dark text-center">
                                 {{item.NgayTao|date:"d-m-Y"}}

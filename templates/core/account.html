@@ -5,30 +5,63 @@
 
 {% include 'header.html' with title="Quản lý tài khoản" %}
 
-{% include 'header-control.html' with first_id="" second_id="" %}
+{% if messages %}
 
-<form action="" method="POST">
+    {% for message in messages %}
+    <div {% if message.tags %} class="alert-{{ message.tags }} alert alert-dismissible"{% endif %} role="alert">
+        <div>{{ message }}</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+
+{% endif %}
+
+{% include 'header-control.html' with first_id="account-search-input" second_id="account-filter-select" %}
+
+{% csrf_token %}
+<div class="overlay"></div>
+<div class="modal" id=""> <!--ID 1-->
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title"> <!--ID 2-->
+
+                </h5>
+                <button type="button" class="btn-close"></button>
+            </div>
+            <div class="modal-body" id="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="cancel-modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submit-modal">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form action="{% url 'search-account' %}" method="GET">
     <div class="row bg-info-subtle pe-2 fs-6">
         <div class="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
-            <input type="text" class="form-control" id="" placeholder="Nhập tên tài khoản..." required>
+            <input type="text" name="q" class="form-control" id="account-search-input" placeholder="Nhập tên tài khoản..." required>
         </div>
         <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
-            <select type="text" class="form-select form-select-sm" id="">
+            <select type="text" name="query-type" class="form-select form-select-sm" id="account-filter-select">
                 <option value="1">Nhà cung cấp thiết bị</option>
-                <option value="2">Người dùng ứng dụng (Android/ios)</option>
+                <!-- <option value="2">Người dùng ứng dụng (Android/ios)</option> -->
                 <option value="3">Quản lý cảng</option>
-                <option value="4">Cơ quan quản lý</option>
+                <option value="4">Chi cục thủy sản</option>
                 <option value="7">All</option>
             </select>
         </div>
         <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
-            <button class="btn btn-primary rounded">
+            <button type="submit" class="btn btn-primary rounded">
                 <i class="fa-brands fa-searchengin"></i>
                 <span class='ms-1 fs-6'>Tìm kiếm</span>
             </button>
         </div>
         <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
-            <button class="btn btn-info rounded">
+            <button type="button" class="btn btn-info rounded" id="reset-accout-input">
                 <i class="fa-solid fa-arrow-rotate-right"></i>
                 <span class='ms-1 fs-6'>Nhập lại</span>
             </button>
@@ -38,7 +71,7 @@
 
 <div class="row bg-info-subtle p-2 fs-6">
     <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
-        <a href="#" class="btn btn-success rounded">
+        <a href="{% url 'add-account' %}" class="btn btn-success rounded">
             <i class="fa-solid fa-circle-plus"></i>
             <span class='ms-1 fs-6'>Tạo mới</span>
         </a>
@@ -74,37 +107,31 @@
                                 {{forloop.counter}}
                             </th>
                             <td class="bg-info-subtle text-dark text-center">
-                                {{item.HoTen}}
+                                {{item.username}}
                             </td>
                             <td class="bg-info-subtle text-dark text-center">
-                                {{item.CMND_CCCD}}
-                            </td>
-                            <td class="bg-info-subtle text-dark text-center">
-                                {{item.DiaChi}}
+                                Level {{item.user_type}}
                             </td>
                             <td class="bg-info-subtle text-dark text-center">
                                 
                             </td>
                             <td class="bg-info-subtle text-dark text-center">
-                                {{item.Email}}
+                                
                             </td>
                             <td class="bg-info-subtle text-dark text-center">
-                                {{item.SoDienThoai}}
+                                
                             </td>
                             <td class="bg-info-subtle text-dark text-center">
-                                {% if item.type == 'captain' %}
-                                    Thuyền trưởng
-                                {% endif %}
-                            
-                                {% if item.type == 'shipowner' %}
-                                    Chủ tàu
-                                {% endif %}
+                                {{item.email}}
                             </td>
                             <td class="bg-info-subtle text-dark text-center">
-                                <a href="#" class="btn btn-secondary">
+                                
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                <a href="{% url 'edit-account' item.id %}" class="btn btn-secondary">
                                     <i class="fa-regular fa-pen-to-square"></i>
                                 </a>
-                                <button class="btn btn-danger modal-button">
+                                <button class="btn btn-danger modal-button" data-pk="{{item.id}}" data-username="{{item.username}}" data-emai="{{item.email}}">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </td>
@@ -115,37 +142,31 @@
                                 {{forloop.counter}}
                             </th>
                             <td class="bg-light text-dark text-center">
-                                {{item.HoTen}}
+                                {{item.username}}
                             </td>
                             <td class="bg-light text-dark text-center">
-                                {{item.CMND_CCCD}}
-                            </td>
-                            <td class="bg-light text-dark text-center">
-                                {{item.DiaChi}}
+                                Level {{item.user_type}}
                             </td>
                             <td class="bg-light text-dark text-center">
                                 
                             </td>
                             <td class="bg-light text-dark text-center">
-                                {{item.Email}}
+                                
                             </td>
                             <td class="bg-light text-dark text-center">
-                                {{item.SoDienThoai}}
+                                
                             </td>
                             <td class="bg-light text-dark text-center">
-                                {% if item.type == 'captain' %}
-                                    Thuyền trưởng
-                                {% endif %}
-                            
-                                {% if item.type == 'shipowner' %}
-                                    Chủ tàu
-                                {% endif %}
+                                {{item.email}}
                             </td>
                             <td class="bg-light text-dark text-center">
-                                <a href="#" class="btn btn-secondary">
+                                
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                <a href="{% url 'edit-account' item.id %}" class="btn btn-secondary">
                                     <i class="fa-regular fa-pen-to-square"></i>
                                 </a>
-                                <button class="btn btn-danger modal-button">
+                                <button class="btn btn-danger modal-button" data-pk="{{item.id}}" data-username="{{item.username}}" data-email="{{item.email}}">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </td>
@@ -158,3 +179,7 @@
 </div>
 
 {% endblock content %}
+
+{% block scripts %}
+    <script src="{% static './assets/js/account.js' %}"></script>
+{% endblock scripts %}

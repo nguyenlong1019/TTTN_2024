@@ -3,8 +3,11 @@
         <h3 class="fs-5 fw-bolder text-capitalize" style="color: #0B60B0;">
             {{title}}
         </h3>
-        <span class="text-dark border border-2 border-dark rounded-circle p-1 d-flex align-items-center justify-content-center" style="width: 40px;height: 40px;">
-            <i class="fa-solid fa-user-large"></i>
+        <span class="dropdown text-dark border border-2 border-dark rounded-circle p-1 d-flex align-items-center justify-content-center" style="width: 40px;height: 40px;">
+            <i class="fa-solid fa-user-large dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></i>
+            <ul class="dropdown-menu">
+                <li><a href="{% url 'logout' %}" class="dropdown-item">Logout</a></li>
+            </ul>
         </span>
     </div>
 </div>

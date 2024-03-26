@@ -10,7 +10,7 @@ const shipInfoBox = document.getElementById('search-info');
 function initMap() {
     let map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 13.678354, lng: 111.400118}, // tọa độ trung tâm
-        zoom: 8,
+        zoom: 15,
     });
 
     // thêm polyline
@@ -151,13 +151,16 @@ function initMap() {
         marineLogLine.setMap(map);
 
         let markers = [];
-        for (let i = 0; i < marineLogCoordinates.length - 1; i++) {
-            let marker = new google.maps.Marker({
-                position: marineLogCoordinates[i],
-                map: map,
-                title: `Vị trì tàu ${info.SoDangKy} ngày ${locationData[i].Ngay}`,
-            });
-            markers.push(marker);
+        if (marineLogCoordinates.length >= 2)
+        {
+            for (let i = 0; i < marineLogCoordinates.length - 1; i++) {
+                let marker = new google.maps.Marker({
+                    position: marineLogCoordinates[i],
+                    map: map,
+                    title: `Vị trì tàu ${info.SoDangKy} ngày ${locationData[i].Ngay}`,
+                });
+                markers.push(marker);
+            }
         }
 
         if (marineLogCoordinates.length > 0) {

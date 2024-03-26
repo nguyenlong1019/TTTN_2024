@@ -88,9 +88,13 @@
         <div class="col mb-2">
             <label for="cangCaDangKy" class="form-label">Cảng cá đăng ký*</label>
             <select class="form-select" name="cangCaDangKy" id="cangCaDangKy" required>
+                {% if request.user.user_type == '2' %}
+                    <option value="{{request.user.staff.cangca.ID}}">{{request.user.staff.cangca.Ten}}</option>
+                {% else %}
                 {% for i in gate_list %}
                     <option value="{{i.ID}}">{{i.Ten}}</option>
                 {% endfor %}
+                {% endif %}
             </select>
         </div>
         <div class="col mb-2">

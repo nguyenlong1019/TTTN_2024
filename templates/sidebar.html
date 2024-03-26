@@ -7,7 +7,7 @@
         <hr class="text-white w-75" />
         <ul class="nav flex-column">
             
-            
+            {% if request.user.is_staff or request.user.user_type == '1' %}
             <li class="nav-item my-1">
                 <a class="d-flex flex-column align-items-center nav-link text-white fs-5" href="{% url 'journal-view' %}">
                     <i class="fa-solid fa-book-journal-whills"></i>
@@ -44,6 +44,49 @@
                     <span class="fs-6 mt-2">Tài Khoản</span>
                 </a>
             </li>
+            {% endif %}
+            {% if request.user.user_type == '2' %}
+            <li class="nav-item my-1">
+                <a class="d-flex flex-column align-items-center nav-link text-white fs-5" href="{% url 'journal-view' %}">
+                    <i class="fa-solid fa-book-journal-whills"></i>
+                    <span class="fs-6 mt-2">Nhật Ký</span>
+                </a>
+            </li>
+            <li class="nav-item text-white my-1">
+                <a class="d-flex flex-column align-items-center nav-link text-white fs-5" href="{% url 'report-view' %}">
+                    <i class="fa-solid fa-chart-simple"></i>
+                    <span class="fs-6 mt-2">Báo Cáo</span>
+                </a>
+            </li>
+            <li class="nav-item text-white my-1">
+                <a class="d-flex flex-column align-items-center nav-link text-white fs-5" href="{% url 'index' %}">
+                    <i class="fa-solid fa-ship"></i>
+                    <span class="fs-6 mt-2">Hải Trình</span>
+                </a>
+            </li>
+            <li class="nav-item text-white my-1">
+                <a class="d-flex flex-column align-items-center nav-link text-white fs-5" href="{% url 'device-view' %}">
+                    <i class="fa-solid fa-server"></i>
+                    <span class="fs-6 mt-2">Thiết Bị</span>
+                </a>
+            </li>
+            <li class="nav-item text-white my-1">
+                <a class="d-flex flex-column align-items-center nav-link text-white fs-5" href="{% url 'shipowners-view' %}">
+                    <i class="fa-solid fa-user"></i>
+                    <span class="fs-6 mt-2">Chủ Tàu</span>
+                </a>
+            </li>
+            {% endif %}
+            {% if request.user.user_type == '3' %}
+            <li class="nav-item text-white my-1">
+                <a class="d-flex flex-column align-items-center nav-link text-white fs-5 active" href="{% url 'device-view' %}">
+                    <i class="fa-solid fa-server"></i>
+                    <span class="fs-6 mt-2">Thiết Bị</span>
+                </a>
+            </li>
+            {% endif %}
+
+            
             
         </ul>
 

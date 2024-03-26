@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<form method="POST" onsubmit="return validateForm()">
+    {% csrf_token %}
+
+<div class="row mt-1 mb-2">
+    <div class="d-flex align-items-center justify-content-between">
+        <a href="{% url 'account-view' %}" class="btn btn-primary"><i class="fa-solid fa-arrow-left"></i></a>
+        <h3 class="fs-5 fw-bolder text-capitalize" style="color: #0B60B0;">
+            Sửa thông tin tài khoản {{user.username}}
+        </h3>
+    </div>
+</div>
+
+<!-- <h4 class="fw-semi fs-6 mt-1">Thông Tin Chung</h4> -->
+<hr class="text-dark" />
+<div class="bg-info-subtle rounded p-3">
+    <div class="row">
+        <div class="col mb-2">
+            <label for="firstName" class="form-label">Họ*</label>
+            <input name="firstName" id="firstName" value="{{user.first_name}}" type="text" class="form-control" required>
+        </div>
+        <div class="col mb-2">
+            <label for="lastName" class="form-label">Tên*</label>
+            <input name="lastName" id="lastName" value="{{user.last_name}}" type="text" class="form-control" required>
+        </div>
+        <div class="col mb-2">
+            <label for="levelManager" class="form-label">Level*</label>
+            <select name="levelManager" id="levelManager" class="form-select" disabled>
+                {% if user.user_type == '1' %}
+                <option value="1">Chi cục thủy sản</option>
+                {% elif user.user_type == '2' %}
+                <option value="2">Quản lý cảng</option>
+                {% else %}
+                <option value="3">Nhà cung cấp thiết bị</option>
+                {% endif %}
+            </select>
+        </div>
+        <div class="col mb-2">
+            <label for="username" class="form-label">Tên tài khoản*</label>
+            <input name="username" id="username" value="{{user.username}}" type="text" class="form-control" required>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col mb-2 col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+            <label for="password" class="form-label">Mật khẩu mới*</label>
+            <input name="password" id="password" type="text" class="form-control" required>
+        </div>
+        <div class="col mb-2 col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+            <label for="confirm-password" class="form-label">Xác nhận mật khẩu*</label>
+            <input name="confirm-password" id="confirm-password" type="text" class="form-control" required>
+        </div>
+        <div class="col mb-2 col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+            <label for="email" class="form-label">Email*</label>
+            <input name="email" id="email" type="text" value="{{user.email}}" class="form-control" required>
+        </div>
+        <div id="additionalField" class="col mb-2 col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xxl-3 d-none">
+            {% if user.staff.cangca %}
+            <label for="tenCangCa" class="form-label">Cảng cá quản lý*</label>
+            <!-- <p>{{user.staff.cangca.ID}}</p> -->
+            <select name="tenCangCa" id="tenCangCa" class="form-select">
+                <option value="{{user.staff.cangca.ID}}">{{user.staff.cangca.Ten}}</option>
+
+            </select>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="rounded mt-3">
+    <div class="row">
+        <div class="col">
+            <a href="{% url 'account-view' %}" class="btn btn-dark">Hủy</a>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+        </div>
+    </div>
+</div>
+
+</form>
+
+<script>
+    function validateForm() {
+        let password = document.getElementById('password').value;
+        let confirmPassword = document.getElementById('confirm-password').value;
+        if (password === confirmPassword) {
+            return true;
+        }
+        return false;
+    }
+</script>
+
+
+{% endblock content %}

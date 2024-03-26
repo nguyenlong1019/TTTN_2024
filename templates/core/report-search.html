@@ -16,6 +16,8 @@
 
 {% endif %}
 
+{% csrf_token %}
+
 <form action="{% url 'report-search' %}" method="GET">
     <div class="row bg-info-subtle mt-2 pt-2 fs-6 fw-bolder rounded-top">
         <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
@@ -35,16 +37,20 @@
                     <option value="{{request.user.staff.cangca.ID}}">{{request.user.staff.cangca.Ten}}</option>
                 {% else %}
                 {% for i in fishing_port %}
+                    {% if gate.ID == i.ID %}
+                    <option value="{{i.ID}}" selected>{{i.Ten}}</option>
+                    {% else %}
                     <option value="{{i.ID}}">{{i.Ten}}</option>
+                    {% endif %}
                 {% endfor %}
                 {% endif %}
             </select>
         </div>
         <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
-            <input type="date" value="2020-01-01" class="form-control col" name="start-date">
+            <input type="date" value="{{start_date}}" class="form-control col" id="start-date" name="start-date">
         </div>
         <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
-            <input type="date" value="2024-01-01" class="form-control col" name="end-date">
+            <input type="date" value="{{end_date}}" class="form-control col" id="end-date" name="end-date">
         </div>
         <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
             <button type="submit" class="btn btn-dark rounded">
@@ -66,25 +72,7 @@
         <strong>Thông tin cơ bản trong 24h qua</strong>
         {% if request.user.user_type == '1' or request.user.is_staff %}
         <div>
-            <strong>Cảng cá: Quy Nhơn</strong>
-            <ul class="mt-2 fs-6">
-                <li>Tàu vào: 512 tàu cập cảng</li>
-                <li>Tàu ra: 123 tàu xuất bến</li>
-                <li>Tổng khối lượng chuyển tải: 756 tấn cá</li>
-                <li>Loài cá được đánh bắt nhiều nhất: Cá ngừ vây vàng</li>
-            </ul>
-        </div>
-        <div>
-            <strong>Cảng cá: Đề Gi</strong>
-            <ul class="mt-2 fs-6">
-                <li>Tàu vào: 512 tàu cập cảng</li>
-                <li>Tàu ra: 123 tàu xuất bến</li>
-                <li>Tổng khối lượng chuyển tải: 756 tấn cá</li>
-                <li>Loài cá được đánh bắt nhiều nhất: Cá ngừ vây vàng</li>
-            </ul>
-        </div>
-        <div>
-            <strong>Cảng cá: Tam Quan</strong>
+            <strong>Cảng cá: {{gate.Ten}}</strong>
             <ul class="mt-2 fs-6">
                 <li>Tàu vào: 512 tàu cập cảng</li>
                 <li>Tàu ra: 123 tàu xuất bến</li>
@@ -156,8 +144,20 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const urlOrigin = window.location.origin;
-    fetch(`${urlOrigin}/report/top-10-fishing-qty-on-24h/`)
+    const requestData = {
+        'query': document.getElementById('search-report-select').value,
+        'start_date': document.getElementById('start-date').value,
+        'end_date': document.getElementById('end-date').value
+    }
+
+    fetch('/report/search-top-10-fish/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value
+        },
+        body: JSON.stringify(requestData)
+    })
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -184,7 +184,7 @@
             data: {
             labels: labels,
             datasets: [{
-                label: 'Top 10 loại cá đánh bắt nhiều nhất trong 24h',
+                label: `Top 10 loại cá đánh bắt nhiều nhất từ ${data.start_date} đến ${data.end_date}`,
                 data: qty,
                 borderWidth: 1
             }]

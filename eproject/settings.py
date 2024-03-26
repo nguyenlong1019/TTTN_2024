@@ -65,7 +65,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+CORS_ALLOWED_ORIGINS = [
+    'http://nhatkydientu.vn',
+    'https://cdn.jsdelivr.net',
+]
+
 CORS_ALLOW_ALL_ORIGINS = True
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 ROOT_URLCONF = 'eproject.urls'
 
@@ -161,3 +167,4 @@ JAZZMIN_SETTINGS = {
     'copyright': 'KTMT02 - K15',
 }
 
+AUTH_USER_MODEL = 'core.CustomUser'

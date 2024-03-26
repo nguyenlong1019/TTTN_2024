@@ -3,6 +3,183 @@
 
 {% block content %}
 
+{% if request.user.user_type == '3' %}
+
+{% include 'header.html' with title="Quản lý thiết bị nhật ký" %}
+
+{% if messages %}
+
+    {% for message in messages %}
+    <div {% if message.tags %} class="alert-{{ message.tags }} alert alert-dismissible"{% endif %} role="alert">
+        <div>{{ message }}</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+
+{% endif %}
+
+
+{% include 'header-control.html' with first_id="search-equipment-input" second_id="filter-equipment-select" %}
+
+{% csrf_token %}
+<div class="overlay"></div>
+<div class="modal" id=""> <!--ID 1-->
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title"> <!--ID 2-->
+
+                </h5>
+                <button type="button" class="btn-close"></button>
+            </div>
+            <div class="modal-body" id="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="cancel-modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submit-modal">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form action="{% url 'search-equipment' %}" method="GET">
+    <div class="row bg-info-subtle pe-2 fs-6">
+        <div class="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xxl-3">
+            <input type="text" name="q" class="form-control" id="search-equipment-input" placeholder="Nhập thông tin tìm kiếm..." required>
+        </div>
+        <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
+            <select type="text" name="query-type" class="form-select form-select-sm" id="filter-equipment-select">
+                <option value="1">Mã thiết bị</option>
+                <option value="2">Serial Number</option>
+                <!-- <option value="3">Mã tàu</option>
+                <option value="3">Mã chủ tàu</option>
+                <option value="4">Mã thuyền trưởng</option>
+                <option value="5">Serial Number</option>
+                <option value="6">All</option> -->
+            </select>
+        </div>
+        <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
+            <button type="submit" class="btn btn-primary rounded">
+                <i class="fa-brands fa-searchengin"></i>
+                <span class='ms-1 fs-6'>Tìm kiếm</span>
+            </button>
+        </div>
+        <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
+            <button type="button" id="reset-equipments-btn" class="btn btn-info rounded">
+                <i class="fa-solid fa-arrow-rotate-right"></i>
+                <span class='ms-1 fs-6'>Nhập lại</span>
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="row bg-info-subtle p-2 fs-6 rounded-bottom">
+    <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
+        <a href="{% url 'add-equipment' %}" class="btn btn-success rounded">
+            <i class="fa-solid fa-circle-plus"></i>
+            <span class='ms-1 fs-6'>Tạo mới</span>
+        </a>
+    </div>
+</div>
+
+<div class="row bg-info-subtle rounded p-2 mt-2 fs-6" style="height: 69vh;overflow-y: auto;">
+    <div class="col-12">
+        <table class="table table-hover shadow" style="overflow-y: auto;">
+            <thead>
+                <tr>
+                    {% for title in titles %}
+                        <th class="bg-primary text-white text-center fw-semi" {% if forloop.first %}style="border-top-left-radius: 6px;"{% endif %} {% if forloop.last %}style="border-top-right-radius: 6px;"{% endif %} scope="col">
+                            {{title}}
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    {% if forloop.counter|divisibleby:2 %}
+                        <tr class="fs-6 bg-info-subtle">
+                            <th class="bg-info-subtle text-dark text-center fw-semi" scope="row">
+                                {{forloop.counter}}
+                            </th>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {{item.SerialNumber}}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {{item.NgaySanXuat|date:"d M, Y"}}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {{item.FWVersion}}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                {% if item.is_active %}
+                                    Đang hoạt động
+                                {% else %}
+                                    Chưa kích hoạt
+                                {% endif %}
+                            </td>
+                            <td class="bg-info-subtle text-dark text-center">
+                                <a href="{% url 'edit-equipment' item.ID %}" class="btn btn-secondary">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
+                                {% if item.is_active %}
+
+                                {% else %}
+                                <button class="btn btn-danger modal-button" data-pk="{{item.ID}}" data-serial-number="{{item.SerialNumber}}">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr class="fs-6 bg-light">
+                            <th class="bg-light text-dark text-center fw-semi" scope="row">
+                                {{forloop.counter}}
+                            </th>
+                            <td class="bg-light text-dark text-center">
+                                {{item.SerialNumber}}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                {{item.NgaySanXuat|date:"d M, Y"}}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                {{item.FWVersion}}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                {% if item.is_active %}
+                                    Đang hoạt động
+                                {% else %}  
+                                    Chưa kích hoạt
+                                {% endif %}
+                            </td>
+                            <td class="bg-light text-dark text-center">
+                                <a href="{% url 'edit-equipment' item.ID %}" class="btn btn-secondary">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
+                                {% if item.is_active %}
+
+                                {% else %}
+                                <button class="btn btn-danger modal-button" data-pk="{{item.ID}}" data-serial-number="{{item.SerialNumber}}">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% else %}
+
 {% include 'header.html' with title="Quản lý hải trình" %}
 
 {% if messages %}
@@ -29,13 +206,13 @@
 
         <!-- Giám sát -->
         <div id="monitor-view" class="w-100 h-100 mt-2">
-            <div class="mb-3 fs-6">
+            <!-- <div class="mb-3 fs-6">
                 <label class="form-label" for="">Nhập mã tàu:</label>
                 <input type="text" class="form-control" placeholder="BĐ-12312">
             </div>
             <div class="mb-3 fs-6">
                 <button class="btn btn-primary" type="button">Tìm kiếm</button>
-            </div>
+            </div> -->
             <div class="mb-3 fs-6 text-white p-3 rounded" style="overflow-y: auto;height: 75%;background-color: #5F5D9C;">
                 {% for ship in ships %}
                 <div class="form-check">
@@ -54,7 +231,7 @@
             <form action="{% url 'marine-view' %}" method="GET" onsubmit="return validateForm()">
                 <div class="mb-3 fs-6 row">
                     <label for="select-ship" class="form-label col">Chọn tàu:</label>
-                    <input type="text" class="form-control col" name="q" id="select-ship" placeholder="BĐ-12399" required />
+                    <input type="text" class="form-control col" name="q" id="select-ship" placeholder="BĐ-12399-TS" required />
                 </div>
                 <div class="mb-3 fs-6 row">
                     <label for="start-date" class="form-label col">Từ ngày:</label>
@@ -78,12 +255,12 @@
 
         <!-- Legend -->
         <div id="legend" class="fs-6" style="background-color: white;padding: 12px;margin: 8px;border-radius: 6px;">
-            <p class="fs-6 mb-1">Tổng số tàu: {{ships.count}}</p>
-            <p class="fs-6 mb-1">Đang hoạt động: {{ships.count}}</p>
-            <p class="fs-6 mb-1">Neo: {{ships.count}}</p>
+            <p class="fs-6 mb-1">Tổng số tàu: {{ship_counter}}</p>
+            <p class="fs-6 mb-1">Đang hoạt động: {{ship_counter}}</p>
+            <p class="fs-6 mb-1">Neo: {{ship_counter}}</p>
         </div>
 
-        <script src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initMap&loading=async" defer></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDejFrO4ZF5CMrlyjM1ieDQjgWuxIkp95U&callback=initMap&loading=async" defer></script>
         <script src="{% static 'assets/js/google-map.js' %}"></script>
     </div>
 </div>
@@ -143,4 +320,13 @@
     }
 </script>
 
+{% endif %}
+
 {% endblock content %}
+
+{% block scripts %}
+    {% if request.user.user_type == '3' %}
+        <script src="{% static './assets/js/equipment.js' %}"></script>
+    {% endif %}
+{% endblock scripts %}
+

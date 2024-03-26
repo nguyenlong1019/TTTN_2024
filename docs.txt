@@ -20,3 +20,67 @@ Click vào avatar cũng có phần logout
 
 Hoàn thiện phần báo cáo 
 
+
+Một số lưu ý khi triển khai lên VPS
+font times cần copy vào 
+api key phải hiển thị chứ không truyền qua biến
+
+
+Bug phần message cần sửa tại một số trang
+Tiếp theo là phân quyền trên api và một số trang 
+
+Xa hơn là api key của user đối với app mobile 
+
+thiết kế logic mới là đối với messages sẵn của django sẽ chuyển hướng về trang chính: ví dụ add ship sẽ về trang quản lý ship 
+còn submit form sẽ là alert trực tiếp với async và await fetch
+
+Bug user level 1 không đăng nhập được trang admin
+
+Tạm dừng phần edit account và xóa account 
+
+Sửa phần base
+
+Còn bug phần vị trí và xóa với thiết bị tàu? nên hiển thị là tàu với thiết bị nhật ký serial number = ...
+
+BUG dữ liệu thực tế:
+tại phần tìm history về hải trình, nhập 3 vị trí nhưng nó chỉ mark 2 vị trí (bug 1)
+tại phần nhập thông tin tàu mới cần phải sắp xếp lại phần cảng theo bảng chứ cái,
+thẻ select không hỗ trợ được nhiều nên cần phải sửa lại thành auto completed và 
+khi chọn vào input sẽ hiển thị dropdown cho phép chọn bảng cá
+
+A hoàng bảo web không phải giám sát nên cho nhật ký trên đầu (chưa thích làm)
+
+Thêm ssl 
+
+Phần tải xuống tại quản lý thiết bị đang bị bug (đã fix)
+
+
+# docs.txt 
+Đã fix: phần thêm tàu và chỉnh sửa thông tin tàu cần sort chủ tàu, thuyền trưởng, cảng cá, mã thiết bị nhật ký khai thác 
+Trong view tàu sort theo số đăng ký 
+phần chủ tàu và thuyền trưởng view (sort theo tên và không xáo trộn)
+phần tài khoản (view) sort theo username và loại bỏ admin
+phần add new account sort phần cảng cá 
+phần report view sort cảng cá tìm kiếm. 
+đã sửa xong toàn bộ bug tý nữa cập nhật phần mềm.
+
+xử lý phần chủ tàu và thuyển trưởng có tàu trong cảng (cập nhật thành công)
+thay đổi 
+
+tiếp theo sửa phần thêm sửa xóa, các phần tìm kiếm cũng cần sort 
+tức là vẫn hiển thị hết lên nhưng sẽ phải xem xét là cái nào được xóa cái nào không? 
+nếu chưa có vị trí thì hiển thị chưa có vị trí cho tàu này 
+tách module riêng
+rename column và design lại toàn bộ cơ sở dữ liệu (ví dụ gộp 2 bảng chủ tàu và thuyền trưởng làm 1)
+
+
+Công việc tuần:
+Sửa đổi, cập nhật đồng bộ hóa database, thêm các bảng mới 
+Giải quyết lỗi kết quả truy vấn không theo thứ tự sắp xếp 
+Tái cấu trúc mã, chia nhỏ các models phục vụ cập nhật phần mềm
+Thêm bảo mật XSS, SQL Injection, Clickjacking 
+Đưa ra giải pháp PDF với JavaScript PDF 
+thêm một cột vào database để xác định tàu cập bến hay chưa và web sẽ chỉ tải một lần duy nhất 
+Phân trang database
+Sử dụng Pyjwt cho giải pháp user trên ứng dụng di động.
+clean API theo RESTful
