@@ -1,6 +1,12 @@
 from django.shortcuts import render, redirect 
 from django.contrib.auth.decorators import login_required 
 
+from core.models import * 
+
+from django.db.models import Q 
+import random, json, operator
+from django.contrib import messages
+from django.http import JsonResponse
 
 
 # quản lý thông tin chủ tàu, thuyền trưởng

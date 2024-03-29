@@ -1,6 +1,13 @@
 from django.shortcuts import render, redirect 
 from django.contrib.auth.decorators import login_required 
 
+from core.models import * 
+
+from django.contrib.auth import get_user_model 
+from django.contrib.auth.hashers import make_password
+from django.db.models import Q 
+from django.contrib import messages 
+
 
 # quản lý tài khoản
 @login_required(login_url='/login/')

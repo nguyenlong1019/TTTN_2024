@@ -3,67 +3,14 @@ from django.contrib.auth.decorators import login_required
 
 from core.models import * 
 
-
-
-
-
-
-
-
-
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, logout, authenticate 
-from django.http import JsonResponse, HttpResponse
+from django.db.models import Q 
 import json 
-import os 
-from dotenv import load_dotenv # pip install python-dotenv
-from django.views.decorators.csrf import csrf_exempt
-import json, random, operator
-from datetime import datetime, date 
-from .models import * 
-
-from django.contrib.auth.models import User 
-
-# Get CustomUser 
-from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import make_password
-
-from django.contrib import messages
-from django.db.models import Q, Max, Sum
-from django.http import HttpResponse 
-from openpyxl import Workbook 
-import tempfile
-
-# Reportlab for PDF
-from reportlab.platypus import Paragraph, Frame, Spacer, Table, TableStyle
-from reportlab.pdfgen import canvas 
-from reportlab.lib.units import cm 
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle 
-from reportlab.lib.pagesizes import letter, landscape 
-from reportlab.pdfbase import pdfmetrics 
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib import colors
-
-
-# Report view
-from django.db.models import Sum 
-from datetime import datetime, timedelta
-from django.utils import timezone
-from django.utils.timezone import make_aware
-
-
-
-
-
-
-
-
+from django.http import HttpResponse, JsonResponse
 
 
 @login_required(login_url='/login/')
 def index(request):
-    '''Quản lý hải trình'''
+    '''Quản lý hải trình: Trang theo dõi vị trí tàu theo thời gian thực'''
     if request.user.user_type == '3':
         titles = ["STT", "Serial Number", "Ngày sản xuất", "Version", "Mã tàu", "Trạng thái", "Thao tác"]
         equipments = BangThietBiNhatKyKhaiThac.objects.all().order_by('-ID')
@@ -105,15 +52,15 @@ def index(request):
     return render(request, '403.html', {}, status=403)
 
 
-# Lichj sử hải trình
 @login_required(login_url='/login/')
 def marine_diary_view(request):
+    """
+    Lịch sử hải trình
+    """
     query = request.GET.get('q')
     start_date = request.GET.get('start-date')
     end_date = request.GET.get('end-date')
     if request.user.user_type == '1' or request.user.is_staff:
-
-        # hiểu, vì filter nó sẽ không gây ra DoesNotExist
         try:
             ships = BangTau.objects.filter(Q(SoDangKy__icontains=query))
             if ships.exists():
@@ -155,8 +102,6 @@ def marine_diary_view(request):
         }, status=200) 
     else:
         return render(request, '403.html', {}, status=403)
-
-
 
 
 # lấy lịch sử vị trí tàu 

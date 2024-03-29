@@ -12,10 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 # pip install python-dotenv
 import os 
-from dotenv import load_dotenv 
 from pathlib import Path
-
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,13 +29,14 @@ DEBUG = True
 # DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
-# ALLOWED_HOSTS = ["https://tttn2024-production.up.railway.app/", "tttn2024-production.up.railway.app"]
+
+# ALLOWED_HOSTS = ["https://nhatkydientu.vn", "nhatkydientu.vn"]
 
 # CSRF_COOKIE_SECURE = True
 # SESSION_COOKIE_SECURE = True
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# CSRF_TRUSTED_ORIGINS = ['https://tttn2024-production.up.railway.app/',"tttn2024-production.up.railway.app"]
+# CSRF_TRUSTED_ORIGINS = ['https://nhatkydientu.vn',"nhatkydientu.vn"]
 
 # Application definition
 
@@ -65,10 +63,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
-CORS_ALLOWED_ORIGINS = [
-    'http://nhatkydientu.vn',
-    'https://cdn.jsdelivr.net',
-]
+
+# CORS_ALLOWED_ORIGINS = [
+#     'http://nhatkydientu.vn',
+#     'https://cdn.jsdelivr.net',
+# ]
 
 CORS_ALLOW_ALL_ORIGINS = True
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None

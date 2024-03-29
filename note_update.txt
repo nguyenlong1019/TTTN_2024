@@ -23,4 +23,7 @@ Bên dưới middleware
 CORS_ALLOW_ALL_ORIGINS = True
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
-Tiếp theo cần sửa trong views.py tại path đường dẫn đến font chứ trong Report lab
+Tiếp theo cần sửa trong views.py tại path đường dẫn đến font chứ trong Report lab 
+
+Cần phải chỉnh sửa quyền 775 đối với project 
+quyền sở hữu của apache

@@ -1,6 +1,24 @@
 from django.shortcuts import render, redirect 
 from django.contrib.auth.decorators import login_required 
 
+from core.models import * 
+
+from django.db.models import Q
+from django.contrib import messages 
+from django.http import HttpResponse, JsonResponse 
+
+# reportlab lib 
+from reportlab.lib.pagesizes import letter, landscape 
+from reportlab.pdfgen import canvas 
+from reportlab.lib import colors 
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle 
+from reportlab.pdfbase import pdfmetrics 
+from reportlab.pdfbase.ttfonts import TTFont 
+from reportlab.lib.units import cm 
+from reportlab.platypus import Frame, Paragraph, Table, TableStyle, Spacer
+
+
+
 
 # Nhật ký khai thác thủy sản 
 @login_required(login_url='/login/')
@@ -424,7 +442,7 @@ def search_journal_view(request):
 
         # mã chuyến biển
         if query_type == '5':
-            tmp = BangChuyenBien.objects.filter(Q(IDChuyenBien__icontains=query) | Q(ChuyenBienSo__icontains=query))
+            tmp = BangChuyenBien.objects.filter(Q(ID__icontains=query) | Q(ChuyenBienSo__icontains=query))
             items = []
             for i in tmp:
                 journal_list = i.bangnhatky_set.all()
