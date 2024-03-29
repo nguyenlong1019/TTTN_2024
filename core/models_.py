@@ -840,7 +840,7 @@ class BangViTriTau(models.Model):
     )
     ViDo = models.DecimalField(decimal_places=6, default=0, max_digits=12)
     KinhDo = models.DecimalField(decimal_places=6, default=0, max_digits=12)
-    Ngay = models.DateTimeField()
+    Ngay = models.DateTimeField(auto_now_add=True)
     TocDo = models.DecimalField(decimal_places=2, default=0, max_digits=12)
     Huong = models.IntegerField(default=0)
 

@@ -114,19 +114,18 @@ function initMap() {
                     url: '/static/assets/imgs/fishing-boat-resize.png',  // sau nên trả url về từ server
                 },
             });
+            console.log(item.NgayCapNhat);
+            // let ngayCapNhat = new Date(item.NgayCapNhat);
 
-            let ngayCapNhat = new Date(item.NgayCapNhat);
-
-            // Định dạng lại ngày giờ
-            let ngay = ngayCapNhat.getDate();
-            let thang = ngayCapNhat.getMonth() + 1; // Tháng bắt đầu từ 0
-            let nam = ngayCapNhat.getFullYear();
-            let gio = ngayCapNhat.getHours();
-            let phut = ngayCapNhat.getMinutes();
-            let giay = ngayCapNhat.getSeconds();
-
-            // Chuỗi định dạng dễ đọc
-            let ngayCapNhatDinhDang = `${gio}:${phut}:${giay} ngày ${ngay}/${thang}/${nam}`;
+            // // Định dạng lại ngày giờ
+            // let ngay = ngayCapNhat.getDate();
+            // let thang = ngayCapNhat.getMonth() + 1; // Tháng bắt đầu từ 0
+            // let nam = ngayCapNhat.getFullYear();
+            // let gio = ngayCapNhat.getUTCHours();
+            // let phut = ngayCapNhat.getMinutes();
+            // let giay = ngayCapNhat.getSeconds();
+            // // Chuỗi định dạng dễ đọc
+            // let ngayCapNhatDinhDang = `${gio}:${phut}:${giay} ngày ${ngay}/${thang}/${nam}`;
 
             const infoWindow = new google.maps.InfoWindow({
                 content: `
@@ -138,7 +137,7 @@ function initMap() {
                         <p class="fs-6">Thuyền trưởng: ${item.ThuyenTruong}</p>
                         <p class="fs-6">Kinh độ: ${item.KinhDo}</p>
                         <p class="fs-6">Vĩ độ: ${item.ViDo}</p>
-                        <p class="fs-6">Ngày cập nhật: ${ngayCapNhatDinhDang}</p>
+                        <p class="fs-6">Ngày cập nhật: ${item.NgayCapNhat}</p>
                     </div>
                 `
             });

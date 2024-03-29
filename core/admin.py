@@ -8,11 +8,6 @@ class UserModel(UserAdmin):
 
 admin.site.register(CustomUser, UserModel)
 
-# class CustomUserAdmin(admin.ModelAdmin):
-#     list_display = ['username', 'email', 'user_type']
-
-# admin.site.register(CustomUser, CustomUserAdmin)
-
 admin.site.register(BangDonViHanhChinhCapTinh)
 admin.site.register(BangDonViHanhChinhCapHuyen)
 admin.site.register(BangMaLoaiTau)

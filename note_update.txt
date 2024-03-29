@@ -1,0 +1,26 @@
+Để cập nhật web site lên VPS cần có một số điều cần lưu ý:
+
+Tại settings.py của project cần sửa đổi các thông tin như: 
+Ẩn secret key:
+
+import json 
+with open('/etc/config.json') as config_file:
+    config = json.load(config_file)
+
+SECRET_KEY = config['SECRET_KEY']
+
+DEBUG = False # trong môi trường sản xuất, trong môi trường phát triển để là True 
+
+ALLOWED_HOSTS = ["nhatkydientu.vn"]
+
+#CSRF_COOKIE_SECURE = True
+#SESSION_COOKIE_SECURE = True
+#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+#CSRF_TRUSTED_ORIGINS = ['https://nhatkydientu.vn']
+
+Bên dưới middleware
+CORS_ALLOW_ALL_ORIGINS = True
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
+Tiếp theo cần sửa trong views.py tại path đường dẫn đến font chứ trong Report lab

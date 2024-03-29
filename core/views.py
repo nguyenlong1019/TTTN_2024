@@ -279,14 +279,16 @@ def get_all_location_api(request):
     info = []
     for i in ships:
         new_loc = i.bangvitritau_set.order_by('-Ngay').first()
+        print(new_loc.Ngay)
         ship_info = {
             'SoDangKy': i.SoDangKy,
             'ChuTau': i.IDChuTau.HoTen,
             'ThuyenTruong': i.IDThuyenTruong.HoTen,
             'ViDo': new_loc.ViDo,
             'KinhDo': new_loc.KinhDo,
-            'NgayCapNhat': new_loc.Ngay,
+            'NgayCapNhat': f"{new_loc.Ngay.hour}:{new_loc.Ngay.minute}:{new_loc.Ngay.second} Ngày {new_loc.Ngay.day} tháng {new_loc.Ngay.month} năm {new_loc.Ngay.year}",
         }
+        # print(ship_info['NgayCapNhat'])
         info.append(ship_info)
     return JsonResponse({
         'status': 200,
