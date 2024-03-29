@@ -1,8 +1,6 @@
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator 
-from django.utils import timezone 
+from django.core.validators import MinValueValidator, MaxValueValidator  
 from datetime import date 
-from django.contrib.auth.models import User 
 import uuid 
 
 from django.contrib.auth.models import AbstractUser
@@ -79,8 +77,8 @@ class BangMaLoaiTau(models.Model):
     ID = models.BigAutoField(
         auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
     )
-    IDLoaiTau = models.CharField(max_length=8, null=False, default='', unique=True)
-    TenLoaiTau = models.CharField(max_length=255, null=False, default='')
+    IDLoaiTau = models.CharField(max_length=8, default='', unique=True)
+    TenLoaiTau = models.CharField(max_length=255, default='')
 
     class Meta:
         verbose_name_plural = "Bảng mã loại tàu"
@@ -117,11 +115,13 @@ class BangChuTau(models.Model):
         help_text='Mã định danh chủ tàu',
     )
     HoTen = models.CharField(
-        max_length=255, null=False, 
-        default='', help_text='Họ tên chủ tàu'
+        max_length=255, 
+        default='', 
+        help_text='Họ tên chủ tàu'
     )
     CMND_CCCD = models.CharField(
-        max_length=20, null=False, default='', 
+        max_length=20, 
+        default='', 
         help_text='Chứng minh nhân dân chủ tàu'
     )
     NgaySinh = models.DateField(null=False, 
@@ -133,19 +133,23 @@ class BangChuTau(models.Model):
         default=date(1900, 1, 1)
     )
     DiaChi = models.CharField(
-        max_length=255, null=False, 
-        default='', help_text='Địa chỉ chủ tàu'
+        max_length=255, 
+        default='', 
+        help_text='Địa chỉ chủ tàu'
     )
     DienThoai = models.CharField(
-        max_length=20, null=False, 
-        default='', help_text='Số điện thoại chủ tàu'
+        max_length=20,
+        default='', 
+        help_text='Số điện thoại chủ tàu'
     )
     Fax = models.CharField(
-        max_length=20, null=True, blank=True, 
+        max_length=20,
+        default='',
         help_text='Số Fax của chủ tàu'
     )
     Email = models.CharField(
-        max_length=100, null=True, blank=True, 
+        max_length=100,
+        default='', 
         help_text='Email của chủ tàu'
     )
 
@@ -190,12 +194,12 @@ class BangThuyenTruong(models.Model):
         help_text='Mã định danh chủ tàu'
     )
     HoTen = models.CharField(
-        max_length=500, null=False, default='', 
+        max_length=500, 
+        default='', 
         help_text='Họ tên thuyền trưởng'
     )
     CMND_CCCD = models.CharField(
         max_length=20, 
-        null=False, 
         default='', 
         help_text='Chứng minh nhân dân thuyền trưởng'
     )
@@ -208,17 +212,18 @@ class BangThuyenTruong(models.Model):
         default=date(1900, 1, 1)
     )
     DiaChi = models.CharField(
-        max_length=255, null=False, default='', 
+        max_length=255,
+        default='', 
         help_text='Địa chỉ thuyền trưởng'
     )
     DienThoai = models.CharField(
-        max_length=20, null=False, default='', 
+        max_length=20,
+        default='', 
         help_text='Số điện thoại thuyền trưởng'
     )
-    Fax = models.CharField(max_length=20, null=True, blank=True)
-    Email = models.CharField(max_length=100, null=True, blank=True)
+    Fax = models.CharField(max_length=20, default='',)
+    Email = models.CharField(max_length=100, default='',)
 
-    # Tham chiếu Mã Huyện
     MaHuyen = models.ForeignKey(
         BangDonViHanhChinhCapHuyen,
         on_delete=models.DO_NOTHING,
@@ -269,12 +274,10 @@ class BangCangCa(models.Model):
     KinhDo = models.DecimalField(null=False, decimal_places=4, 
         default=0, help_text='Kinh độ cảng cá', max_digits=8)
     
-    # các trường tự thêm
     Fax = models.CharField(max_length=20, 
-        null=True, blank=True, help_text='Fax cảng cá')
+        default='', help_text='Fax cảng cá')
     Email = models.CharField(max_length=128, 
-        null=True, blank=True, help_text='Email cảng cá')
-    # các trường tự thêm
+        default='', help_text='Email cảng cá')
     
     # Cảng trưởng nên thêm model vào User ()
     TenCangTruong = models.CharField(max_length=128, 
@@ -282,7 +285,6 @@ class BangCangCa(models.Model):
     DienThoaiCangTruong = models.CharField(max_length=20, 
         null=True, blank=True, help_text='Điện thoại cảng trưởng')
 
-    # Quan hệ 1 - n với bảng đơn vị hành chính cấp tỉnh
     IDTinh = models.ForeignKey(
         BangDonViHanhChinhCapTinh,
         on_delete=models.DO_NOTHING,
@@ -360,8 +362,7 @@ class BangThietBiNhatKyKhaiThac(models.Model):
             MaxValueValidator(limit_value=date.today())
         ]
     )
-    FWVersion = models.CharField(max_length=10, null=False, 
-        default='', help_text='Version Firmware')
+    FWVersion = models.CharField(max_length=10, default='', help_text='Version Firmware')
 
     is_active = models.BooleanField(default=False)
 
@@ -421,7 +422,7 @@ class BangTau(models.Model):
     SoDangKy = models.CharField(
         max_length=15, null=False, default='', 
         help_text='Số đăng ký'
-    ) # số đăng ký giống như biển số của tàu
+    ) 
     TenTau = models.CharField(max_length=128, 
         null=False, default='', help_text='Tên tàu')
     HoHieu = models.CharField(max_length=128, 
@@ -431,17 +432,13 @@ class BangTau(models.Model):
     IMO = models.CharField(max_length=128, null=False, default='', 
         help_text='IMO - International Maritime Organization - Tổ chức hàng hải quốc tế'
     )
-    # tham chiếu đến bảng đơn vị hành chính cấp tỉnh
-    # một tàu thuộc về một tỉnh, một tỉnh có nhiều tàu
     NoiDangKy = models.ForeignKey(
         BangDonViHanhChinhCapTinh,
         on_delete=models.DO_NOTHING,
         null=False,
         default=1
     )
-    # tham chiếu đến bảng cảng cá
-    # một cảng cá quản lý nhiều tàu, một tàu thuộc một cảng cá 
-    # (tàu đăng ký bắt đầu hoạt động ở một cảng cá nhưng vẫn có thể đến các cảng cá khác)
+    
     CangCaDangKy = models.ForeignKey(
         related_name='cangcadangky',
         to=BangCangCa,
@@ -450,7 +447,7 @@ class BangTau(models.Model):
         null=False,
         default=1
     )
-    # tham chiếu đến cả cá phụ của bảng cảng cá
+    
     CangCaPhu = models.ForeignKey(
         related_name='cangcadangky_2',
         to=BangCangCa,
@@ -459,7 +456,7 @@ class BangTau(models.Model):
         null=False,
         default=1
     )
-    # tham chiếu đến bảng ngành nghề khai thác
+
     NgheChinh = models.ForeignKey(
         related_name='nghechinh',
         to=BangNganhNgheKhaiThac,
@@ -468,13 +465,12 @@ class BangTau(models.Model):
         default=1
     )
 
-    # tham chiếu đến bảng ngành nghề khai thác
     NghePhu1 = models.ForeignKey(related_name='nghephu_1', 
         to=BangNganhNgheKhaiThac,
         on_delete=models.DO_NOTHING,
         null=True, blank=True
     ) 
-    # tham chiếu đến bảng ngành nghề khai thác
+    
     NghePhu2 = models.ForeignKey(related_name='nghephu_2', 
         to=BangNganhNgheKhaiThac,
         on_delete=models.DO_NOTHING,
@@ -506,7 +502,6 @@ class BangTau(models.Model):
     ], help_text='Ngày sản xuất')
     NgayHetHan = models.DateField(null=True, blank=True, default=date(1900, 1, 1), help_text='Ngày hết hạn')
 
-    # tham chiếu đến bảng mã loại tàu
     LoaiTau = models.ForeignKey(
         BangMaLoaiTau,
         on_delete=models.DO_NOTHING,
@@ -520,28 +515,27 @@ class BangTau(models.Model):
     VanTocHanhTrinh = models.FloatField(null=False, 
         default=0, help_text='Vận tốc lớn nhất của tàu')
     
-    # tham chiếu đến bảng thiết bị nhật ký khai thác
     IDDevice = models.OneToOneField(
         BangThietBiNhatKyKhaiThac,
         on_delete=models.DO_NOTHING,
         null=True, 
         blank=True
     )  
-    # tham chiếu đến bảng chủ tàu
+    
     IDChuTau = models.ForeignKey(
         BangChuTau,
         on_delete=models.DO_NOTHING,
         related_name='bangtau_chutau',
         null=True, blank=True,
     )  
-    # tham chiếu đến bảng thuyền trưởng
+    
     IDThuyenTruong = models.OneToOneField(
         BangThuyenTruong,
         on_delete=models.DO_NOTHING,
         null=True,
         blank=True
     )
-    # tham chiếu đến tỉnh
+    
     IDTinh = models.ForeignKey(
         related_name='bang_tau_tinh',
         to=BangDonViHanhChinhCapTinh,
@@ -565,17 +559,17 @@ class BangLoaiCaDanhBat(models.Model):
     IDCa: string, (2-6), bắt buộc: Mã định danh của loại cá
     Ten: string, (1-128), bắt buộc: Tên loại cá
     '''
-    IDLoaiCa = models.BigAutoField(
+    ID = models.AutoField(
         auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
     )
-    MaLoaiCa = models.CharField(
+    IDCa = models.CharField(
         max_length=6,
         null=False,
         default='',
         unique=True,
         help_text='Mã định danh của loại cá'
     )
-    TenLoaiCa = models.CharField(max_length=128, null=False, 
+    Ten = models.CharField(max_length=128, null=False, 
         default='', help_text='Tên loại cá')
 
     class Meta:
@@ -646,7 +640,8 @@ class BangChiTietVungBienDanhBat(models.Model):
         return f"{self.ID}-{self.IDVungBien.Ten}"
 
 
-class ToaDo(models.Model):
+class BangToaDo(models.Model):
+    '''Bảng tọa độ của vùng biển'''
     ID = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     IDVungBien = models.ForeignKey(BangChiTietVungBienDanhBat, on_delete=models.DO_NOTHING,default=1)
     ViDo = models.DecimalField(null=False,default=0,decimal_places=4, max_digits=8)
@@ -659,175 +654,159 @@ class ToaDo(models.Model):
         return f"{self.ID} {self.ViDo}:{self.KinhDo}"
 
 
-# class BangChuyenBien(models.Model):
-#     '''
-#     Đối tượng chuyến biển
+class BangChuyenBien(models.Model):
+    '''
+    Đối tượng chuyến biển
 
-#     ID
-#     IDChuyenBien: Guid, bắt buộc: Mã định danh chuyển biến
-#     ChuyenBienSo: Integer, bắt buộc: Số thứ tự chuyến biển trong năm
-#     NgayXuatBen: string (10), bắt buộc: Ngày xuất bến, định dạng dd/MM/yyyy
-#     CangXuatBen: string (2-3), bắt buộc: Mã cảng xuất bến
-#     VungBienDanhBat: string (1-500), bắt buộc: Tên vùng biển đánh bắt
-#     NgayVeBen: string (10), bắt buộc: Ngày về bến
-#     CangVeBen: string (2-3), bắt buộc: Mã cảng về bến
-#     KhoiLuongChuyenTai: integer, không bắt buộc: Khối lượng chuyển tải
-#     IDTau: Guid, bắt buộc: Mã định danh tàu cá
-#     '''
-#     # ID = models.BigAutoField(
-#     #     auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
-#     # )
-#     # IDChuyenBien = models.UUIDField(
-#     #     unique=True,editable=False,default=uuid.uuid4,
-#     #     help_text='Mã định danh chuyến biển'
-#     # )
-#     IDChuyenBien = models.BinaryField(primary_key=True, max_length=8)
-#     ChuyenBienSo = models.IntegerField(null=False, 
-#         default=0, help_text='Số thứ tự chuyến biển trong năm')
-#     NgayXuatBen = models.DateField(
-#         null=False, validators=[
-#             MinValueValidator(limit_value=date(1900, 1, 1)),
-#             MaxValueValidator(limit_value=date.today())
-#         ], 
-#         default=date(1900, 1, 1), help_text='Ngày xuất bến'
-#     )
-#     CangXuatBen = models.ForeignKey(
-#         BangCangCa, 
-#         on_delete=models.DO_NOTHING,
-#         null=False, 
-#         default=1,
-#         related_name='cangxuatben'
-#     )
-#     ViDoXuatBen = models.DecimalField(decimal_places=6, max_digits=12, null=True, blank=True)
-#     KinhDoXuatBen = models.DecimalField(decimal_places=6, max_digits=12, null=True, blank=True)
-#     VungBienDanhBat = models.ForeignKey(
-#         BangVungBienDanhBat,
-#         on_delete=models.DO_NOTHING,
-#         null=True,
-#         blank=True
-#     )
+    ID
+    IDChuyenBien: Guid, bắt buộc: Mã định danh chuyển biến
+    ChuyenBienSo: Integer, bắt buộc: Số thứ tự chuyến biển trong năm
+    NgayXuatBen: string (10), bắt buộc: Ngày xuất bến, định dạng dd/MM/yyyy
+    CangXuatBen: string (2-3), bắt buộc: Mã cảng xuất bến
+    VungBienDanhBat: string (1-500), bắt buộc: Tên vùng biển đánh bắt
+    NgayVeBen: string (10), bắt buộc: Ngày về bến
+    CangVeBen: string (2-3), bắt buộc: Mã cảng về bến
+    KhoiLuongChuyenTai: integer, không bắt buộc: Khối lượng chuyển tải
+    IDTau: Guid, bắt buộc: Mã định danh tàu cá
+    '''
+    ID = models.BigAutoField(
+        auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+    )
+    
+    ChuyenBienSo = models.IntegerField(null=False, 
+        default=0, help_text='Số thứ tự chuyến biển trong năm')
+    NgayXuatBen = models.DateField(
+        null=False, validators=[
+            MinValueValidator(limit_value=date(1900, 1, 1)),
+            MaxValueValidator(limit_value=date.today())
+        ], 
+        default=date(1900, 1, 1), help_text='Ngày xuất bến'
+    )
+    CangXuatBen = models.ForeignKey(
+        BangCangCa, 
+        on_delete=models.DO_NOTHING,
+        null=False, 
+        default=1,
+        related_name='cangxuatben'
+    )
+    ViDoXuatBen = models.DecimalField(decimal_places=6, max_digits=12, null=True, blank=True)
+    KinhDoXuatBen = models.DecimalField(decimal_places=6, max_digits=12, null=True, blank=True)
+    VungBienDanhBat = models.ForeignKey(
+        BangVungBienDanhBat,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True
+    )
 
-#     # CangXuatBen = models.CharField(max_length=6, null=False, 
-#     #     default='', help_text='Mã cảng xuất bến') # tham chiếu đến bảng cảng cá
-#     # VungBienDanhBat = models.CharField(max_length=500, null=False, 
-#     #     default='', help_text='Tên vùng biển đánh bắt') # tham chiếu đến bảng vùng biển đánh bắt
-#     NgayVeBen = models.DateField(null=False, validators=[
-#         MinValueValidator(limit_value=date(1900, 1, 1)),
-#         MaxValueValidator(limit_value=date.today())
-#     ], default=date(1900, 1, 1), help_text='Ngày về bến')
-#     CangVeBen = models.ForeignKey(BangCangCa, on_delete=models.DO_NOTHING, 
-#         default=1, help_text='Mã cảng về bến', related_name='cangveben') # tham chiếu đến bảng cảng cá
-#     ViDoVeBen = models.DecimalField(decimal_places=6, max_digits=12, null=True, blank=True)
-#     KinhDoVeBen = models.DecimalField(decimal_places=6, max_digits=12, null=True, blank=True)
-#     KhoiLuongChuyenTai = models.IntegerField(null=True, 
-#         blank=True, help_text='Khối lượng chuyến tải')
-#     # chuyến biển của tàu nào
+    NgayVeBen = models.DateField(null=False, validators=[
+        MinValueValidator(limit_value=date(1900, 1, 1)),
+        MaxValueValidator(limit_value=date.today())
+    ], default=date(1900, 1, 1), help_text='Ngày về bến')
+    CangVeBen = models.ForeignKey(BangCangCa, on_delete=models.DO_NOTHING, 
+        default=1, help_text='Mã cảng về bến', related_name='cangveben') # tham chiếu đến bảng cảng cá
+    ViDoVeBen = models.DecimalField(decimal_places=6, max_digits=12, null=True, blank=True)
+    KinhDoVeBen = models.DecimalField(decimal_places=6, max_digits=12, null=True, blank=True)
+    KhoiLuongChuyenTai = models.IntegerField(null=True, 
+        blank=True, help_text='Khối lượng chuyến tải')
+    KhoiLuongDanhBat = models.IntegerField(default=0, help_text='Khối lượng đánh bắt')
 
-#     IDTau = models.ForeignKey(
-#         BangTau,
-#         on_delete=models.DO_NOTHING,
-#         null=False,
-#         default=1
-#     ) 
+    IDTau = models.ForeignKey(
+        BangTau,
+        on_delete=models.DO_NOTHING,
+        null=False,
+        default=1
+    ) 
 
-#     class Meta:
-#         verbose_name_plural = "Bảng chuyến biển"
+    class Meta:
+        verbose_name_plural = "Bảng chuyến biển"
 
-#     def __str__(self):
-#         return f"{self.ID}-{self.IDTau.SoDangKy}-Chuyến biển: {self.ChuyenBienSo}-Khối lượng: {self.KhoiLuongChuyenTai}"
+    def __str__(self):
+        return f"{self.ID}-{self.IDTau.SoDangKy}-Chuyến biển: {self.ChuyenBienSo}-Khối lượng: {self.KhoiLuongChuyenTai}"
 
 
-# class BangMeLuoi(models.Model):
-#     '''
-#     Đối tượng mẻ lưới
+class BangMeLuoi(models.Model):
+    '''
+    Đối tượng mẻ lưới
 
-#     ID
-#     IDChuyenBien: Guid, bắt buộc: Mã định danh chuyến biển
-#     IDMeLuoi: Guid, bắt buộc: Mã định danh mẻ lưới
-#     STT: Integer, bắt buộc: Số thứ tự của mẻ lưới của chuyến biển
-#     ThoiDiemThaNguCu: string (16), bắt buộc: Thời điểm thả ngư cụ (ngày tháng năm giờ phút)
-#     ViDoThaNguCu: Float, bắt buộc: Vĩ độ thả ngư cụ, làm tròn 4 chữ số phần thập phân
-#     KinhDoThaNguCu: Float, bắt buộc: Kinh độ thả ngư cụ
-#     ThoiDiemThuNguCu: String (16), bắt buộc: Thời điểm thu ngư cụ
-#     ViDoThuNguCu: Float, bắt buộc: Vĩ độ thu ngư cụ
-#     KinhDoThuNguCu: Float, bắt buộc: Kinh độ thu ngư cụ
-#     TongSanLuong: Integer, bắt buộc: Tổng sản lượng của mẻ lưới
-#     '''
-#     # ID = models.BigAutoField(
-#     #     auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
-#     # )
-#     # một chuyến biển có nhiều mẻ lưới, một mẻ lưới xác định thuộc về một chuyến biển
-#     IDMeLuoi = models.BinaryField(primary_key=True, max_length=10)
-#     IDChuyenBien = models.ForeignKey(
-#         BangChuyenBien,
-#         on_delete=models.DO_NOTHING,
-#         null=True,
-#         blank=True
-#     )
-#     # IDMeLuoi = models.UUIDField( 
-#     #     unique=True, editable=False,
-#     #     default=uuid.uuid4, help_text='Mã định danh của mẻ lưới'    
-#     # )
-#     # STT = models.IntegerField(null=False, default=0, 
-#     #     help_text='Số thứ tự của mẻ lưới của chuyến biển')
-#     ThoiDiemThaNguCu = models.DateTimeField()
-#     # Hoặc sử dụng MaxValue như sau:
-#     # MaxValueValidator(limit_value=timezone.now().replace(second=0, microsecond=0)),
-#     ViDoThaNguCu = models.DecimalField(null=False, default=0, max_digits=12,
-#         decimal_places=6, help_text='Vĩ độ thả ngư cụ')
-#     KinhDoThaNguCu = models.DecimalField(null=False, default=0, max_digits=12,
-#         decimal_places=6, help_text='Kinh độ thả ngư cụ')
-#     ThoiDiemThuNguCu = models.DateTimeField()
-#     ViDoThuNguCu = models.DecimalField(max_digits=12, null=False, default=0, 
-#         decimal_places=6, help_text='Vĩ độ thu ngư cụ')
-#     KinhDoThuNguCu = models.DecimalField(max_digits=12, null=False, default=0, 
-#         decimal_places=6, help_text='Kinh độ thu ngư cụ')
-#     TongSanLuong = models.IntegerField(null=False, 
-#         default=0, help_text='Tổng sản lượng của mẻ lưới')
+    ID
+    IDChuyenBien: Guid, bắt buộc: Mã định danh chuyến biển
+    IDMeLuoi: Guid, bắt buộc: Mã định danh mẻ lưới
+    STT: Integer, bắt buộc: Số thứ tự của mẻ lưới của chuyến biển
+    ThoiDiemThaNguCu: string (16), bắt buộc: Thời điểm thả ngư cụ (ngày tháng năm giờ phút)
+    ViDoThaNguCu: Float, bắt buộc: Vĩ độ thả ngư cụ, làm tròn 4 chữ số phần thập phân
+    KinhDoThaNguCu: Float, bắt buộc: Kinh độ thả ngư cụ
+    ThoiDiemThuNguCu: String (16), bắt buộc: Thời điểm thu ngư cụ
+    ViDoThuNguCu: Float, bắt buộc: Vĩ độ thu ngư cụ
+    KinhDoThuNguCu: Float, bắt buộc: Kinh độ thu ngư cụ
+    TongSanLuong: Integer, bắt buộc: Tổng sản lượng của mẻ lưới
+    '''
+    ID = models.BigAutoField(
+        auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+    )
+    IDChuyenBien = models.ForeignKey(
+        BangChuyenBien,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True
+    )
+    MeLuoiSo = models.IntegerField(default=0, 
+        help_text='Số thứ tự của mẻ lưới của chuyến biển')
+    ThoiDiemThaNguCu = models.DateTimeField()
+    ViDoThaNguCu = models.DecimalField(null=False, default=0, max_digits=12,
+        decimal_places=6, help_text='Vĩ độ thả ngư cụ')
+    KinhDoThaNguCu = models.DecimalField(null=False, default=0, max_digits=12,
+        decimal_places=6, help_text='Kinh độ thả ngư cụ')
+    ThoiDiemThuNguCu = models.DateTimeField()
+    ViDoThuNguCu = models.DecimalField(max_digits=12, null=False, default=0, 
+        decimal_places=6, help_text='Vĩ độ thu ngư cụ')
+    KinhDoThuNguCu = models.DecimalField(max_digits=12, null=False, default=0, 
+        decimal_places=6, help_text='Kinh độ thu ngư cụ')
+    TongSanLuong = models.IntegerField(null=False, 
+        default=0, help_text='Tổng sản lượng của mẻ lưới')
 
-#     class Meta:
-#         verbose_name_plural = "Bảng mẻ lưới"
+    class Meta:
+        verbose_name_plural = "Bảng mẻ lưới"
 
-#     def __str__(self):
-#         return f"{self.ID}-Tàu: {self.IDChuyenBien.IDTau.SoDangKy}-Chuyến biển: {self.IDChuyenBien.ChuyenBienSo}-{self.IDChuyenBien.KhoiLuongChuyenTai}-Mẻ lưới: {self.STT}-Sản lượng: {self.TongSanLuong}"
+    def __str__(self):
+        return f"{self.ID}-Tàu: {self.IDChuyenBien.IDTau.SoDangKy}-Chuyến biển: {self.IDChuyenBien.ChuyenBienSo}-{self.IDChuyenBien.KhoiLuongChuyenTai}-Mẻ lưới: {self.MeLuoiSo}-Sản lượng: {self.TongSanLuong}"
 
 
-# class BangLoaiCaDuocDanhBatTrongMeLuoi(models.Model):
-#     '''
-#     Đối tượng loại cá được đánh bắt trong một mẻ lưới (mẻ lưới - loại cá)
+class BangLoaiCaDuocDanhBatTrongMeLuoi(models.Model):
+    '''
+    Đối tượng loại cá được đánh bắt trong một mẻ lưới (mẻ lưới - loại cá)
 
-#     ID
-#     IDMeLuoi: Guid, bắt buộc: Mã định danh mẻ lưới
-#     STT: Integer, bắt buộc: Số thứ tự của loại cá của mẻ lưới
-#     IDLoaiCa: string (2-6), bắt buộc: Mã loại cá
-#     SanLuong: Integer, bắt buộc: Sản lượng loại cá được đánh bắt trong một mẻ lưới
-#     '''
+    ID
+    IDMeLuoi: Guid, bắt buộc: Mã định danh mẻ lưới
+    STT: Integer, bắt buộc: Số thứ tự của loại cá của mẻ lưới
+    IDLoaiCa: string (2-6), bắt buộc: Mã loại cá
+    SanLuong: Integer, bắt buộc: Sản lượng loại cá được đánh bắt trong một mẻ lưới
+    '''
 
-#     ID = models.BigAutoField(
-#         auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
-#     )
-#     IDMeLuoi = models.ForeignKey(
-#         BangMeLuoi,
-#         on_delete=models.DO_NOTHING,
-#         null=True,
-#         blank=True
-#     )
-#     STT = models.IntegerField(null=False, default=0, 
-#         help_text='Số thứ tự của loại cá của mẻ lưới')
-#     IDLoaiCa = models.ForeignKey(
-#         BangLoaiCaDanhBat,
-#         on_delete=models.DO_NOTHING,
-#         null=False,
-#         default=1
-#     )
-#     SanLuong = models.IntegerField(null=False, 
-#         default=0, help_text='Sản lượng loại cá được đánh bắt trong mẻ lưới')
+    ID = models.BigAutoField(
+        auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+    )
+    IDMeLuoi = models.ForeignKey(
+        BangMeLuoi,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True
+    )
+    # STT = models.IntegerField(default=0, 
+    #     help_text='Số thứ tự của loại cá của mẻ lưới')
+    IDLoaiCa = models.ForeignKey(
+        BangLoaiCaDanhBat,
+        on_delete=models.DO_NOTHING,
+        null=False,
+        default=1
+    )
+    SanLuong = models.IntegerField(null=False, 
+        default=0, help_text='Sản lượng loại cá được đánh bắt trong mẻ lưới')
 
-#     class Meta:
-#         verbose_name_plural = "Bảng loại cá đánh bắt được trong mẻ lưới"
+    class Meta:
+        verbose_name_plural = "Bảng loại cá đánh bắt được trong mẻ lưới"
 
-#     def __str__(self):
-#         return f"{self.ID}-ID mẻ lưới: {self.IDMeLuoi.STT}-Tổng mẻ lưới: {self.IDMeLuoi.TongSanLuong}-Loại cá: {self.IDLoaiCa.Ten}-Sản lượng: {self.SanLuong}"
+    def __str__(self):
+        return f"{self.ID}-ID mẻ lưới: {self.IDMeLuoi.MeLuoiSo}-Tổng mẻ lưới: {self.IDMeLuoi.TongSanLuong}-Loại cá: {self.IDLoaiCa.Ten}-Sản lượng: {self.SanLuong}"
 
 
 class BangViTriTau(models.Model):
@@ -839,7 +818,7 @@ class BangViTriTau(models.Model):
     )
     ViDo = models.DecimalField(decimal_places=6, default=0, max_digits=12)
     KinhDo = models.DecimalField(decimal_places=6, default=0, max_digits=12)
-    Ngay = models.DateTimeField()
+    Ngay = models.DateTimeField(auto_now_add=True)
     TocDo = models.DecimalField(decimal_places=2, default=0, max_digits=12)
     Huong = models.IntegerField(default=0)
 
@@ -850,27 +829,49 @@ class BangViTriTau(models.Model):
         return f"{self.IDTau.SoDangKy}-{self.ViDo}:{self.KinhDo}"
      
 
-# class BangNhatKy(models.Model):
-#     ID = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-#     IDThietBi = models.ForeignKey(
-#         BangTau,
-#         on_delete=models.DO_NOTHING,
-#         default=1
-#     )
-#     IDChuyenBien = models.ForeignKey(
-#         BangChuyenBien,
-#         on_delete=models.DO_NOTHING,
-#         null=True,
-#         blank=True
-#     )
-#     MaNhatKy = models.CharField(max_length=24, null=True, blank=True)
-#     NgayTao = models.DateTimeField(auto_now_add=True)
+class BangNhatKy(models.Model):
+    ID = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    IDThietBi = models.ForeignKey(
+        BangTau,
+        on_delete=models.DO_NOTHING,
+        default=1
+    )
+    IDChuyenBien = models.ForeignKey(
+        BangChuyenBien,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True
+    )
+    MaNhatKy = models.CharField(max_length=24, null=True, blank=True)
+    NgayTao = models.DateTimeField(auto_now_add=True)
 
-#     class Meta:
-#         verbose_name_plural = "Bảng nhật ký"
+    class Meta:
+        verbose_name_plural = "Bảng nhật ký"
 
-#     def __str__(self):
-#         return f"{self.ID}-{self.IDThietBi.SoDangKy}"
+    def __str__(self):
+        return f"{self.ID}-{self.IDThietBi.SoDangKy}"
+
+    
+class BangChuyenTai(models.Model):
+    ID = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    ChuyenBien = models.ForeignKey(
+        BangChuyenBien,
+        null=True,
+        blank=True,
+        on_delete=models.DO_NOTHING
+    )
+    ChuyenTaiSo = models.IntegerField(default=0, help_text='Chuyến tải số')
+    TauChuyenTai = models.CharField(max_length=50, default='', help_text='Tàu chuyển tải')
+    ViDoChuyenTai = models.DecimalField(max_digits=12, decimal_places=6, null=True, blank=True, help_text='Vĩ độ chuyển tải')
+    KinhDoChuyenTai = models.DecimalField(max_digits=12, decimal_places=6, null=True, blank=True, help_text='Kinh độ chuyển tải')    
+    ThoiGianChuyenTai = models.DateTimeField(null=True, blank=True)
+
+
+class BangPackage(models.Model):
+    ID = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    IDTau = models.IntegerField(null=True, blank=True)
+
+# tạm dừng các bảng khác, vì cách đặt tên
 
 
 @receiver(post_save, sender=CustomUser)
@@ -898,4 +899,3 @@ def save_user_profile(sender, instance, **kwargs):
         instance.staff.save()
     if instance.user_type == 3:
         instance.provider.save()
-

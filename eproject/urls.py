@@ -27,5 +27,7 @@ urlpatterns = [
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-handler404 = 'core.views.handler404'
-handler500 = 'core.views.handler500'
+handler404 = 'core.views.handle_error.handler404'
+handler500 = 'core.views.handle_error.handler500'
+handler403 = 'core.views.handle_error.handler403'
+handler400 = 'core.views.handle_error.handler400'

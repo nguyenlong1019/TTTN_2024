@@ -1,5 +1,14 @@
 from django.urls import path 
-from .views import *
+
+from core.views.login import *
+from core.views.home import * 
+from core.views.journal import *
+from core.views.report import * 
+from core.views.equipment import * 
+from core.views.account import * 
+from core.views.shipowners import * 
+from core.views.mobile import * 
+from core.views.device import * 
 
 
 urlpatterns = [

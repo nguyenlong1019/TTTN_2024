@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json, random, operator
 from datetime import datetime, date 
 from .models import * 
+
 from django.contrib.auth.models import User 
 
 # Get CustomUser 
@@ -198,8 +199,6 @@ def marine_diary_view(request):
         }, status=200) 
     else:
         return render(request, '403.html', {}, status=403)
-
-
 
 
 # lấy lịch sử vị trí tàu 

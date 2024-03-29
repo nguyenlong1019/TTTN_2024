@@ -84,3 +84,10 @@ thêm một cột vào database để xác định tàu cập bến hay chưa v�
 Phân trang database
 Sử dụng Pyjwt cho giải pháp user trên ứng dụng di động.
 clean API theo RESTful
+
+Sửa đổi database:
+Thay vì authenticate ở database để xác thực các trường thì nên xác thực tại phía client nữa 
+sửa đổi các quan hệ cho phép null hoặc là khi xóa chủ tàu hoặc thuyền trưởng sẽ thông báo rằng có xóa được không?  
+Đối với chủ tàu và thuyền trưởng thì số CMND và Số điện thoại và email phải là duy nhất (cũng check tại server vì không sét được trong database)
+
+Sử lý xong các models tái cấu trúc gồm user.py, shipowners.py, report.py, journal.py, equipment.py 
