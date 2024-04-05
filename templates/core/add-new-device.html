@@ -1,14 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}Thêm tàu mới{% endblock %}
+
 
 {% block content %}
-{% if message %}
-<div class="alert alert-warning alert-dismissible mt-2 mb-2" role="alert">
-    <div>{{message}}</div>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endif %}
 
 <form method="POST" onsubmit="return validateForm()">
     {% csrf_token %}
@@ -21,6 +17,16 @@
     </div>
 </div>
 
+{% if messages %}
+
+    {% for message in messages %}
+    <div {% if message.tags %} class="alert-{{ message.tags }} alert alert-dismissible"{% endif %} role="alert">
+        <div>{{ message }}</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+
+{% endif %}
 
 <h4 class="fw-semi fs-6 mt-1">Thông Tin Chung</h4>
 <hr class="text-dark" />

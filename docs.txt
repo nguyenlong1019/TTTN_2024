@@ -165,3 +165,24 @@ Has Next: {{ships.has_next}} <br>
 Current Page: {{ships.number}} <br>
 Number of Page: {{ships.paginator.num_pages}} <br>
 <hr><br>
+
+Xong phân trang hoàn thiện lúc 9h47
+
+
+PDF.js 
+PDFMake 
+jsPDF 
+PDF-lbi
+
+sử dụng jsPDF
+
+
+
+
+{% if item.bangvitritau_set.exists %} 
+
+
+bug phần search chủ tàu, thuyền trưởng trong device 
+ẩn search IMO và số đăng ký, 
+phần edit ẩn số đăng ký tàu
+phần location cần xử lý

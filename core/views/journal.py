@@ -18,6 +18,9 @@ from reportlab.lib.units import cm
 from reportlab.platypus import Frame, Paragraph, Table, TableStyle, Spacer
 
 
+@login_required(login_url='/login/')
+def journal_test_view(request):
+    return render(request, 'journal-test.html', {})
 
 
 # Nhật ký khai thác thủy sản 
@@ -114,7 +117,8 @@ def generate_journal_pdf(request, pk):
     rect_height = 25
     text = ediary.MaNhatKy
     text_width, text_height = pdf.stringWidth(text), 16
-    text_x = rect_x + (rect_width - text_width) / 2
+    # text_x = rect_x + (rect_width - text_width) / 2
+    text_x = rect_x
     text_y = rect_y + (rect_height - text_height) / 2
 
     # Vẽ hình chữ nhật
@@ -249,13 +253,14 @@ def generate_journal_pdf(request, pk):
     # print(tmp_list)
 
     data = [
-        ['Mẻ\nthứ', 'Thời \nđiểm bắt\nđầu thả', 'Vị trí thả', '', 'Thời\nđiểm kết\nthúc thu', 'Vị trí thu', '', 'Sản lượng các loài chủ yếu**(kg)', '', '', '', '', '', 'Tổng \nsản\nlượng'],
-        ['', '', 'Vĩ độ', 'Kinh độ', '', 'Vĩ độ', 'Kinh độ', 'Loài 1', 'Loài 2', 'Loài 3', 'Loài 4', 'Loài 5', 'Loài 6', ''],
+        ['Mẻ\nthứ', 'Thời \nđiểm bắt\nđầu thả', 'Vị trí thả', '', 'Thời\nđiểm kết\nthúc thu', 'Vị trí thu', '', 'Sản lượng các loài chủ yếu**(kg)', '', '', '', '', '', 'Tổng \nsản\nlượng\n(kg)'],
+        ['', '', 'Vĩ độ', 'Kinh độ', '', 'Vĩ độ', 'Kinh độ', 'Loài\n cá\n có\n 5\n chữ', 'Loài\n cá\n có\n khoảng\n 6\n chữ\n', 'Loài 3', 'Loài 4', 'Loài 5', 'Loài 6', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
         ['', '', '', '', ''],
     ]
-    # [1, '20/01/2023', 13.04, 109.01, '20/02/2023', 13.05, 110.11, 100, 200, 3000, 400, 500, 900, sum_qty[0]],
-    # [2, '21/02/2023', 13.04, 109.01, '21/03/2023', 13.05, 110.11, 100, 200, 3000, 400, 500, 900, sum_qty[1]],
-    # [3, '21/02/2023', 13.04, 109.01, '21/03/2023', 13.05, 110.11, 100, 200, 3000, 400, 500, 900, sum_qty[2]],
     data.extend(tmp_list)
 
     table = Table(data, colWidths=colWidths)
@@ -265,17 +270,17 @@ def generate_journal_pdf(request, pk):
         ("FONT", (0, 0), (-1, -1), "Times_New_Roman",13),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+        ('INNERGRID', (0, 0), (-1,-1), 0.25, colors.black),
         ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-        ("SPAN", (0, 0), (0, 2)),  # Row span from row 0 to row 1 for the first column (col - row) (col - row )  (Row span thì col giữ nguyên) # mẻ thứ
-        ("SPAN", (1, 0), (1, 2)),   # Row span from row 1 to row 2 for the second column  # thời điểm bắt đầu thả
+        ("SPAN", (0, 0), (0, 6)),  # Row span from row 0 to row 1 for the first column (col - row) (col - row )  (Row span thì col giữ nguyên) # mẻ thứ
+        ("SPAN", (1, 0), (1, 6)),   # Row span from row 1 to row 2 for the second column  # thời điểm bắt đầu thả
         ("SPAN", (2, 0), (3, 0)),  # Column span from column 0 to column 2 for the first Row (col span thì row giữ nguyên) # vị trí thả
-        ("SPAN", (2, 1), (2, 2)), # vĩ độ thả
-        ("SPAN", (3, 1), (3, 2)), # kinh độ thả
-        ("SPAN", (4, 0), (4, 2)), # thời điểm kết thúc thu 
+        ("SPAN", (2, 1), (2, 6)), # vĩ độ thả
+        ("SPAN", (3, 1), (3, 6)), # kinh độ thả
+        ("SPAN", (4, 0), (4, 6)), # thời điểm kết thúc thu 
         ("SPAN", (5, 0), (6, 0)), # vị trí thu
-        ("SPAN", (5, 1), (5, 2)), # vĩ độ thu
-        ("SPAN", (6, 1), (6, 2)), # kinh độ thu
+        ("SPAN", (5, 1), (5, 6)), # vĩ độ thu
+        ("SPAN", (6, 1), (6, 6)), # kinh độ thu
         ("SPAN", (7, 0), (12, 0)), # sản lượng các loài
         ("SPAN", (7, 1), (7, 2)), # loài
         ("SPAN", (8, 1), (8, 2)), # loài
@@ -283,7 +288,14 @@ def generate_journal_pdf(request, pk):
         ("SPAN", (10, 1), (10, 2)), # loài
         ("SPAN", (11, 1), (11, 2)), # loài
         ("SPAN", (12, 1), (12, 2)), # loài
-        ("SPAN", (13, 0), (13, 2)) # tổng sản lượng
+        ("SPAN", (13, 0), (13, 6)), # tổng sản lượng
+
+        ("SPAN", (7, 1), (7, 6)),  # Loài cá có 5 chữ
+        ("SPAN", (8, 1), (8, 6)),  # Loài cá có khoảng 6 chữ
+        ("SPAN", (9, 1), (9, 6)),  # Loài 3
+        ("SPAN", (10, 1), (10, 6)),  # Loài 4
+        ("SPAN", (11, 1), (11, 6)),  # Loài 5
+        ("SPAN", (12, 1), (12, 6)),  # Loài 6
     ])
     table.setStyle(tstyle)
     flow_obj4.append(table)

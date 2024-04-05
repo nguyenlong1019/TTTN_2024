@@ -28,6 +28,7 @@ urlpatterns = [
     path('journal/auto-generate-pdf/<pk>/', generate_journal_pdf, name='generate-journal-pdf'),
     path('journal/view_journal_pdf/<pk>/', journal_pdf_view, name='journal_pdf'),
     path('journal/search/', search_journal_view, name='search-journal'),
+    path('journal/test/', journal_test_view, name='journal-test'),
 
     # Device: ship
     path('device/', device_view, name='device-view'),

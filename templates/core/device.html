@@ -55,7 +55,7 @@
                 <option value="3">Tên chủ tàu</option>
                 <option value="4">Tên thuyền trưởng</option>
                 <option value="5">Mã thiết bị nhật ký</option>
-                <option value="6">All</option>
+                <option value="6">IMO và Số đăng ký</option>
             </select>
         </div>
         <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
@@ -116,11 +116,12 @@
                 </tr>
             </thead>
             <tbody>
+                {% with start_number=start_number %}
                 {% for item in ships %}
                     {% if forloop.counter|divisibleby:2 %}
                         <tr class="fs-6 bg-info-subtle">
                             <th class="bg-info-subtle text-dark text-center fw-semi" scope="row">
-                                {{forloop.counter}}
+                                {{forloop.counter|add:start_number}}
                             </th>
                             <td class="bg-info-subtle text-dark text-center">
                                 {{item.IMO}}
@@ -151,11 +152,10 @@
                                 {{item.IDDevice.SerialNumber}}
                             </td>
                             <td class="bg-info-subtle text-dark text-center">
-                                {% if item.bangvitritau_set.exists %}
                                 <button class="btn btn-danger modal-button" data-command="location" data-comfirm="{{item.SoDangKy}}" data-pk="{{item.ID}}">
                                     <i class="fa-solid fa-location-dot"></i>
                                 </button>
-                                {% endif %}
+                                
                                 <a class="btn btn-warning" href="{% url 'edit-device' item.ID %}"><i class="fa-regular fa-pen-to-square"></i></a>
                                 <button class="btn btn-dark modal-button" data-command="trash" data-comfirm="{{item.SoDangKy}}" data-pk="{{item.ID}}">
                                     <i class="fa-solid fa-trash"></i>
@@ -165,7 +165,7 @@
                     {% else %}
                         <tr class="fs-6 bg-light">
                             <th class="bg-light text-dark text-center fw-semi" scope="row">
-                                {{forloop.counter}}
+                                {{forloop.counter|add:start_number}}
                             </th>
                             <td class="bg-light text-dark text-center">
                                 {{item.IMO}}
@@ -196,11 +196,10 @@
                                 {{item.IDDevice.SerialNumber}}
                             </td>
                             <td class="bg-light text-dark text-center">
-                                {% if item.bangvitritau_set.exists %}
+                                
                                 <button class="btn btn-danger modal-button" data-command="location" data-comfirm="{{item.SoDangKy}}" data-pk="{{item.ID}}">
                                     <i class="fa-solid fa-location-dot"></i>
                                 </button>
-                                {% endif %}
                                 
                                 <a class="btn btn-warning" href="{% url 'edit-device' item.ID %}"><i class="fa-regular fa-pen-to-square"></i></a>
                                 
@@ -211,42 +210,10 @@
                         </tr>
                     {% endif %}
                 {% endfor %}
+                {% endwith %}
             </tbody>
         </table>
-        <!-- <br>
-        {{ships}}
-        <br>
-        Has Previous: {{ships.has_previous}} <br>
-        Has Next: {{ships.has_next}} <br>
-        Current Page: {{ships.number}} <br>
-        Number of Page: {{ships.paginator.num_pages}} <br>
-        <hr><br> -->
-
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
-              
-        {% if ships.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
-            <li class="page-item"><a class="page-link" href="?page={{ships.previous_page_number}}">Previous</a></li>
-        {% endif %}
-
-        <!-- <li class="page-item"><a href="#" class="page-link disabled">Page {{ships.number}} of {{ships.paginator.num_pages}}</a></li> -->
-
-        {% for i in nums %}
-
-        <li class="page-item"><a href="?page={{forloop.counter}}" class="page-link">{{forloop.counter}}</a></li>
-
-        {% endfor %}
-
-        {% if ships.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ships.next_page_number}}">Next</a></li>
-            <li class="page-item"><a class="page-link" href="?page={{ships.paginator.num_pages}}">Last &raquo;</a></li>
-        {% endif %}
-
-            </ul>
-        </nav>
-
-        <br>
+        
         <nav aria-label="Page navigation example">
             <ul class="pagination justify-content-center">
                 {% if ships.has_previous %}
@@ -254,14 +221,9 @@
                     <li class="page-item"><a class="page-link" href="?page={{ ships.previous_page_number }}">Previous</a></li>
                 {% endif %}
 
-                <span>Devide</span>
-
-        
                 {% for num in page_range %}
                     <li class="page-item {% if num == ships.number %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
                 {% endfor %}
-
-                <span>Devide</span>
         
                 {% if ships.has_next %}
                     <li class="page-item"><a class="page-link" href="?page={{ ships.next_page_number }}">Next</a></li>
