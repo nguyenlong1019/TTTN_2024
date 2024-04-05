@@ -1,16 +1,29 @@
 from django.shortcuts import render, redirect 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login
 
 from core.models import * 
 
-from django.db.models import Q 
-import json 
-from django.http import HttpResponse, JsonResponse
+from django.db.models import Q, Sum
+import json, tempfile
+from openpyxl import Workbook 
+from django.http import HttpResponse, JsonResponse  
+from django.contrib import messages
+
+# Report view
+from django.utils import timezone 
+from datetime import timedelta 
 
 
 @login_required(login_url='/login/')
 def index(request):
-    '''Quản lý hải trình: Trang theo dõi vị trí tàu theo thời gian thực'''
+    '''
+    Trang chủ:
+
+    Đối với user level 1: Theo dõi hải trình tất cả các tàu
+    Đối với user level 2: Theo dõi hải trình của tất cả các tàu thuộc cảng quản lý
+    Đối với user level 3: Quản lý thiết bị nhật ký theo dõi
+    '''
     if request.user.user_type == '3':
         titles = ["STT", "Serial Number", "Ngày sản xuất", "Version", "Mã tàu", "Trạng thái", "Thao tác"]
         equipments = BangThietBiNhatKyKhaiThac.objects.all().order_by('-ID')
@@ -20,18 +33,23 @@ def index(request):
         }, status=200)
 
     if request.user.user_type == '1' or request.user.is_staff:
-        # Filter theo tàu nào đã có vị trí, tàu nào chưa có vị trí để tránh lỗi
         ships = []
+        # Filter theo tàu nào đã có vị trí, tàu nào chưa có vị trí để tránh lỗi
         ships_with_position = BangTau.objects.prefetch_related('bangvitritau_set')
         ship_counter = 0
         for ship in ships_with_position:
             if ship.bangvitritau_set.exists():
                 ships.append(ship)
                 ship_counter += 1
+
+        total_ship = len(BangTau.objects.all())
+        off_ship = total_ship - ship_counter
         
         return render(request, 'core/index.html', {
             'ships': ships,
             'ship_counter': ship_counter,
+            'total_ship': total_ship,
+            'off_ship': off_ship,
         }, status=200)
     
     if request.user.user_type == '2':
@@ -43,14 +61,179 @@ def index(request):
             if ship.bangvitritau_set.exists():
                 ships.append(ship)
                 ship_counter += 1
+        
+        total_ship = len(BangTau.objects.filter(CangCaDangKy=request.user.staff.cangca))
+        off_ship = total_ship - ship_counter
 
         return render(request, 'core/index.html', {
             'ships': ships,
-            'ship_counter': ship_counter
+            'ship_counter': ship_counter,
+            'total_ship': total_ship,
+            'off_ship': off_ship,
         }, status=200) 
 
     return render(request, '403.html', {}, status=403)
 
+
+@login_required(login_url='/login/')
+def get_all_location_api(request):
+    '''
+    Hàm lấy vị trí và thông tin các tàu: chỉ lấy được vị trí các tàu đã có vị trí
+
+    Đối với user level 1: lấy tất cả vị trí và các tàu
+    Đối với user level 2: lấy tất cả vị trí và các tàu
+    ''' 
+    ships = []
+    if request.user.user_type == '1' or request.user.is_staff:
+        ships_with_position = BangTau.objects.prefetch_related('bangvitritau_set')
+    elif request.user.user_type == '2':
+        ships_with_position = BangTau.objects.filter(CangCaDangKy=request.user.staff.cangca).prefetch_related('bangvitritau_set')
+    else:
+        return JsonResponse({
+            'message': 'Permission not allowed',
+            'status': 403,
+            'info': []
+        }, status=403) 
+
+    for ship in ships_with_position:
+        if ship.bangvitritau_set.exists():
+            ships.append(ship)
+
+    info = []
+    for i in ships:
+        new_loc = i.bangvitritau_set.order_by('-Ngay').first()
+        ship_info = {
+            'SoDangKy': i.SoDangKy,
+            'ChuTau': i.IDChuTau.HoTen,
+            'ThuyenTruong': i.IDThuyenTruong.HoTen,
+            'ViDo': new_loc.ViDo,
+            'KinhDo': new_loc.KinhDo,
+            'NgayCapNhat': f"{new_loc.Ngay.hour}:{new_loc.Ngay.minute}:{new_loc.Ngay.second} Ngày {new_loc.Ngay.day} tháng {new_loc.Ngay.month} năm {new_loc.Ngay.year}",
+        }
+        info.append(ship_info)
+    return JsonResponse({
+        'status': 200,
+        'message': 'Cập nhật thông tin vị trí các tàu thành công!',
+        'info': info,
+    }, status=200)
+
+
+@login_required(login_url='/login/')
+def get_ship_location_api(request, SoDangKy):
+    '''
+    Hàm lấy vị trí và thông tin của một tàu theo Số đăng ký
+
+    Đối với user level 1: Filter toàn bộ để tìm tàu có Số đăng ký khớp
+    Đối với user level 2: Filter theo Số đăng ký và Cảng cá đăng ký của user
+    '''
+    try:
+        if request.user.user_type == '1' or request.user.is_staff:
+            ship = BangTau.objects.get(SoDangKy=SoDangKy)
+        elif request.user.user_type == '2':
+            ship = BangTau.objects.get(SoDangKy=SoDangKy, CangCaDangKy=request.user.staff.cangca)
+        else:
+            return JsonResponse({
+                'message': 'Permission not allowed',
+                'status': 403,
+                'bundle': {}
+            }, status=403)
+    except Exception as e:
+        return JsonResponse({
+            'status': 404,
+            'message': 'Ship not Found!',
+            'bundle': {}
+        }, status=404)
+
+    location = BangViTriTau.objects.filter(IDTau=ship).order_by('-Ngay')[0]
+    return JsonResponse({
+        'status': 200,
+        'message': f'Get info of ship: {ship.SoDangKy} successfully!',
+        'bundle': {
+            'shipowner': ship.IDChuTau.HoTen,
+            'captain': ship.IDThuyenTruong.HoTen,
+            'lat': location.ViDo,
+            'lng': location.KinhDo,
+            'date': f"{location.Ngay.hour}:{location.Ngay.minute}:{location.Ngay.second} Ngày {location.Ngay.day} tháng {location.Ngay.month} năm {location.Ngay.year}",
+            'SoDangKy': ship.SoDangKy,
+        }
+    }, status=200)
+
+
+@login_required(login_url='/login/')
+def download_realtime_all_location_view(request):
+    if request.user.user_type == '1' or request.user.is_staff:
+        ships_with_position = BangTau.objects.prefetch_related('bangvitritau_set')
+        ships = []
+        for ship in ships_with_position:
+            if ship.bangvitritau_set.exists():
+                ships.append(ship)
+        wb = Workbook()
+        ws = wb.active
+        ws['A1'] = "STT"
+        ws['B1'] = "Số đăng ký tàu"
+        ws['C1'] = "Chủ tàu"
+        ws['D1'] = "Số điện thoại chủ tàu"
+        ws['E1'] = "Thuyền trưởng"
+        ws['F1'] = "Cảng cá đăng ký"
+        ws['G1'] = "Mã thiết bị nhật ký"
+        ws['H1'] = "Vĩ độ hiện tại"
+        ws['I1'] = "Kinh độ hiện tại"
+        ws['J1'] = "Thời gian"
+
+        for i, ship in enumerate(ships, start=2):
+            location = ship.bangvitritau_set.order_by('-Ngay').first()
+            ws[f"A{i}"] = i - 1
+            ws[f"B{i}"] = ship.SoDangKy
+            ws[f"C{i}"] = ship.IDChuTau.HoTen
+            ws[f"D{i}"] = ship.IDChuTau.DienThoai
+            ws[f"E{i}"] = ship.IDThuyenTruong.HoTen
+            ws[f"F{i}"] = ship.CangCaDangKy.Ten
+            ws[f"G{i}"] = ship.IDDevice.SerialNumber
+            ws[f"H{i}"] = location.ViDo
+            ws[f"I{i}"] = location.KinhDo
+            ws[f"J{i}"] = f"{location.Ngay.hour}:{location.Ngay.minute}:{location.Ngay.second} {location.Ngay.day}-{location.Ngay.month}-{location.Ngay.year}"
+            
+
+        # Trước khi lưu workbook, tính toán chiều rộng tối ưu cho từng cột
+        for column_cells in ws.columns:
+            length = max(len(str(cell.value)) for cell in column_cells)
+            # Cài đặt chiều rộng của cột
+            ws.column_dimensions[column_cells[0].column_letter].width = length + 2  # Thêm một giới hạn để tránh chữ bị cắt
+
+        _, filepath = tempfile.mkstemp(suffix='.xlsx')
+        wb.save(filepath)
+
+        with open(filepath, 'rb') as f:
+            excel_data = f.read()
+
+        response = HttpResponse(excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename="realtime-location.xlsx"'
+        return response
+
+    else:
+        return render(request, '403.html', {}, status=403)
+
+
+@login_required(login_url='/login/')
+def change_password_view(request):
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        user = request.user 
+        user.set_password(password)
+        user.save()
+        
+        login(request, user)
+
+        messages.info(request, "Cập nhật mật khẩu thành công!")
+        return redirect('index')
+    
+    return render(request, 'change-password.html', {})
+
+
+
+##########################################################################
+##### CLEAN CODE TO 234
+##########################################################################
 
 @login_required(login_url='/login/')
 def marine_diary_view(request):
@@ -106,7 +289,7 @@ def marine_diary_view(request):
 
 # lấy lịch sử vị trí tàu 
 @login_required(login_url='/login/')
-def get_ship_location_api(request):
+def get_history_ship_location_api(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
@@ -158,46 +341,6 @@ def get_ship_location_api(request):
             'message': 'Method not allowed',
             'status': 405
         }, status=405)
-    
-
-# Lấy info của tất cả các tàu và hiển thị trên map 
-@login_required(login_url='/login/')
-def get_all_location_api(request):
-    # ships = BangTau.objects.all()
-
-    # Lấy danh sách tàu đã có vị trí
-    ships = []
-    if request.user.user_type == '1' or request.user.is_staff:
-        ships_with_position = BangTau.objects.prefetch_related('bangvitritau_set')
-    elif request.user.user_type == '2':
-        ships_with_position = BangTau.objects.filter(CangCaDangKy=request.user.staff.cangca).prefetch_related('bangvitritau_set')
-    else:
-        return render(request, '403.html', {}, status=403)
-
-    for ship in ships_with_position:
-        if ship.bangvitritau_set.exists():
-            ships.append(ship)
-
-    info = []
-    for i in ships:
-        new_loc = i.bangvitritau_set.order_by('-Ngay').first()
-        print(new_loc.Ngay)
-        ship_info = {
-            'SoDangKy': i.SoDangKy,
-            'ChuTau': i.IDChuTau.HoTen,
-            'ThuyenTruong': i.IDThuyenTruong.HoTen,
-            'ViDo': new_loc.ViDo,
-            'KinhDo': new_loc.KinhDo,
-            'NgayCapNhat': f"{new_loc.Ngay.hour}:{new_loc.Ngay.minute}:{new_loc.Ngay.second} Ngày {new_loc.Ngay.day} tháng {new_loc.Ngay.month} năm {new_loc.Ngay.year}",
-        }
-        # print(ship_info['NgayCapNhat'])
-        info.append(ship_info)
-    return JsonResponse({
-        'status': 200,
-        'message': 'Cập nhật thông tin vị trí các tàu thành công!',
-        'info': info,
-    }, status=200)
-
 
 
 @login_required(login_url='/login/')

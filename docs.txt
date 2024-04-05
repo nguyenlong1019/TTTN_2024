@@ -90,4 +90,78 @@ Thay vì authenticate ở database để xác thực các trường thì nên x�
 sửa đổi các quan hệ cho phép null hoặc là khi xóa chủ tàu hoặc thuyền trưởng sẽ thông báo rằng có xóa được không?  
 Đối với chủ tàu và thuyền trưởng thì số CMND và Số điện thoại và email phải là duy nhất (cũng check tại server vì không sét được trong database)
 
-Sử lý xong các models tái cấu trúc gồm user.py, shipowners.py, report.py, journal.py, equipment.py 
+Không tái cấu trúc được models vì lỗi, tái cấu trúc thành công views, viết tái cấu trúc views, template và sửa một số lỗi
+design lại trang đăng nhập :
+
+
+https://www.c-map.com/app/
+
+https://www.genesismaps.com/Dashboard
+Sử dụng mail rinnmusic2.2@gmail.com và mật khẩu do google tạo. 
+
+Thêm phần như chú nói, thêm phần auto completed, và lịch sử 8 tiếng (có thể tạo tạm 1 bảng để giải quyết vấn đề đó)
+Đối với tài khoản admin cao nhất có thể tải vị trí và thông tin tàu về thời gian thực, 
+xử lý tìm kiếm một cách tốt nhất để không có bug: ngày tìm kiếm trong phạm vi, nếu không trong phạm vi cần thông báo
+có thể sử dụng toast để hiển thị thông báo, không tìm ngày trong tương lai, không tìm tàu chưa có vị trí 
+tìm thấy tàu: thông báo rằng tàu chưa có vị trí, không tìm thấy tàu thì thông báo là không tồn tại tàu có query = ... 
+
+
+Flow tại hiển thị như sau: 
+init map -> hiển thị tất cả các tàu, danh sách các tàu và tất cả 
+mỗi 5p cập nhật thông tin vị trí 1 lần 
+
+tại select radio button: chọn vào cái nào hiển thị một tàu đó và 
+thông tin của nó, ẩn các tàu còn lại (fetch để lấy vị trí và 
+thông tin của một tàu)
+
+khi select vào tất cả thì hiển thị ra tất cả 
+và cái phần select vào cũng là 5 phút cập nhật một lần 
+thì phải xác định có 1 tàu hay nhiều tàu đang hiển thị :(
+tại phần get ship api by SoDangKy, trả về một vị trí tàu đối với user level 1 thì tàu nào cũng được
+nhưng đối với user level 2 là tàu phải có trong cảng đăng ký là cảng quản lý của user level 2 để
+tránh truy cập api trái phép 
+fix bug hiển thị các tàu đang bật thiết bị, các tàu có vị trí trả về 
+
+Solution giải quyết search tàu: bây giờ search thì oke thôi (fix cái icon nhỏ lại)
+nhưng còn việc phải chuyển để search có nên hay không? 
+5 phút cập nhật 1 lần thì phần search có cập nhật hay không? tại sợ nó sẽ cập nhật khi đang ở history (lịch sử)
+=> khi click vào history thì clear interval và cho search vị trí, nếu không tìm thấy thì message thôi chứ không chuyển
+trang gì cả,
+còn khi click vào giám sát thì load lại toàn bộ và kích hoạt interval 
+Về phần legend chú thích tàu thì không cần thay đổi làm gì cả :) 
+Gộp index.js và ship-search-view.js 
+
+Auto Completed trong html
+
+Xong 1 cái: 
+Phía các trang khác phân trang database, viết code clean và xử lý lại, còn việc check unique của một tàu thì sao? 
+check unique nếu oke r thì thôi, còn chưa thì xử lý tiếp 
+xử lý toàn bộ code và thêm tính năng change password và kiểm thử lại toàn bộ lỗi.
+
+Clean lại toàn bộ project, phần font cũng nên cho vào một folder và cấu hình lại 
+Viết unittest, tích hợp bảo mật, hoàn thiện báo cáo và gửi.
+
+Nghiên cứu phần jwt (Json Web Token để authentication cho mobile)
+Mobile k cần section hay cookie gì cả vì có access token và long token duy trì rồi 
+
+App Android tĩnh 
+
+clean code trước sau đó clean các thư mục 
+
+18:17 làm chức năng change password 
+Hide/Show password (18:51)
+https://www.youtube.com/watch?v=945xZpwy9w8
+
+Xem đến 7:56 (bắt đầu 8h đến 8h35)
+https://www.youtube.com/watch?v=N-PB-HMFmdo&list=PLCC34OHNcOtqW9BJmgQPPzUpJ8hl49AGy&index=18
+
+đến 15:27
+Phân trang như sau:
+<br>
+{{ships}}
+<br>
+Has Previous: {{ships.has_previous}} <br>
+Has Next: {{ships.has_next}} <br>
+Current Page: {{ships.number}} <br>
+Number of Page: {{ships.paginator.num_pages}} <br>
+<hr><br>

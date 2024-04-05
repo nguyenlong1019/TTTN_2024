@@ -116,7 +116,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for item in items %}
+                {% for item in ships %}
                     {% if forloop.counter|divisibleby:2 %}
                         <tr class="fs-6 bg-info-subtle">
                             <th class="bg-info-subtle text-dark text-center fw-semi" scope="row">
@@ -213,6 +213,63 @@
                 {% endfor %}
             </tbody>
         </table>
+        <!-- <br>
+        {{ships}}
+        <br>
+        Has Previous: {{ships.has_previous}} <br>
+        Has Next: {{ships.has_next}} <br>
+        Current Page: {{ships.number}} <br>
+        Number of Page: {{ships.paginator.num_pages}} <br>
+        <hr><br> -->
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+              
+        {% if ships.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ships.previous_page_number}}">Previous</a></li>
+        {% endif %}
+
+        <!-- <li class="page-item"><a href="#" class="page-link disabled">Page {{ships.number}} of {{ships.paginator.num_pages}}</a></li> -->
+
+        {% for i in nums %}
+
+        <li class="page-item"><a href="?page={{forloop.counter}}" class="page-link">{{forloop.counter}}</a></li>
+
+        {% endfor %}
+
+        {% if ships.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ships.next_page_number}}">Next</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ships.paginator.num_pages}}">Last &raquo;</a></li>
+        {% endif %}
+
+            </ul>
+        </nav>
+
+        <br>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                {% if ships.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ ships.previous_page_number }}">Previous</a></li>
+                {% endif %}
+
+                <span>Devide</span>
+
+        
+                {% for num in page_range %}
+                    <li class="page-item {% if num == ships.number %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endfor %}
+
+                <span>Devide</span>
+        
+                {% if ships.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ ships.next_page_number }}">Next</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ ships.paginator.num_pages }}">Last &raquo;</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        
     </div>
 </div>
 

@@ -13,7 +13,11 @@ from core.views.device import *
 
 urlpatterns = [
     path('', index, name='index'),
+    path('download/all-location/', download_realtime_all_location_view, name='download-all-location'),
+    path('change-password/', change_password_view, name='change-password'),
+
     path('marine_log/', marine_diary_view, name='marine-view'),
+
     path('report/', report_view, name='report-view'),
     path('report/top-10-fishing-qty-on-24h/', top_10_fishing_api, name='top-10-fishing-24h'),
     path('report/search/', search_report_view, name='report-search'),
@@ -60,9 +64,9 @@ urlpatterns += [
 
 # RESTful API
 urlpatterns += [
-    path('api/location/<pk>/', get_location_view_api, name='get-location-api'),
+    path('api/location/<SoDangKy>/', get_ship_location_api, name='get-location-api'),
     path('api/all-location/', get_all_location_api, name='all-location'),
-    path('api/get-marine-log/', get_ship_location_api, name='marine-log-api'),
+    path('api/get-marine-log/', get_history_ship_location_api, name='marine-log-api'),
 ]
 
 # Mobile API 

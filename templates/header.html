@@ -6,7 +6,12 @@
         <span class="dropdown text-dark border border-2 border-dark rounded-circle p-1 d-flex align-items-center justify-content-center" style="width: 40px;height: 40px;">
             <i class="fa-solid fa-user-large dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></i>
             <ul class="dropdown-menu">
-                <li><a href="{% url 'logout' %}" class="dropdown-item">Logout</a></li>
+                <li class="dropdown-item">{{request.user.username}}</li>
+                <li class="dropdown-item">Account Level {{request.user.user_type}}</li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'change-password'  %}">Thay đổi mật khẩu</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a href="{% url 'logout' %}" class="dropdown-item">Đăng xuất</a></li>
             </ul>
         </span>
     </div>

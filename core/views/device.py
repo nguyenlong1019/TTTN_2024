@@ -9,6 +9,9 @@ import tempfile
 from django.http import HttpResponse, JsonResponse 
 from django.contrib import messages
 
+# Import Pagination Stuff 
+from django.core.paginator import Paginator
+
 
 # quản lý tàu cá 
 @login_required(login_url='/login/')
@@ -17,15 +20,32 @@ def device_view(request):
     titles = ["STT","IMO","Số hiệu tàu","Chủ tàu","Loại tàu","Nơi đăng ký","Thuyền trưởng","Cảng cá ĐK","TBNKKT","Thao tác"]
     
     if request.user.user_type == '1' or request.user.is_staff:
-        items = BangTau.objects.all().order_by('SoDangKy')
+        # items = BangTau.objects.all().order_by('SoDangKy')
+
+        # Set up pagination: p for pagination: 7 items on page
+        p = Paginator(BangTau.objects.all().order_by('SoDangKy'), 1)
     elif request.user.user_type == '2':
-        items = BangTau.objects.filter(Q(CangCaDangKy=request.user.staff.cangca)).order_by('SoDangKy')
+        # items = BangTau.objects.filter(Q(CangCaDangKy=request.user.staff.cangca)).order_by('SoDangKy')
+        p = Paginator(BangTau.objects.filter(Q(CangCaDangKy=request.user.staff.cangca)).order_by('SoDangKy'), 7)
     else:
         return render(request, '403.html', {}, status=403)
+    
+    # p = Paginator(items, 8)
+    page = request.GET.get('page')
+    ships = p.get_page(page)
+    nums = [i+1 for i in range(ships.paginator.num_pages)]
+    # print(nums)
+    current = ships.number
+    start = max(current - 2, 1)
+    end = min(current + 2, len(nums))
+
+    page_range = range(start, end)
 
     return render(request, 'core/device.html', {
-        'titles': titles,
-        'items': items, 
+        'titles': titles, 
+        'ships': ships,
+        'nums': nums,
+        'start': start, 'end': end, 'page_range': page_range,
     }, status=200)
 
 

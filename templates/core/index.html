@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% block title %} Trang chủ {% endblock %}
 {% block content %}
 
 {% if request.user.user_type == '3' %}
@@ -194,7 +194,7 @@
 {% endif %}
 
 <div class="row bg-info-subtle rounded mt-2" style="height: 90%;overflow: hidden;">
-    <div class="col-2 col-sm-3 col-md-2 col-lg-2 col-xl-2 col-xxl-2 p-3 d-flex flex-column justify-content-between">
+    <div class="col-2 col-sm-3 col-md-2 col-lg-2 col-xl-2 col-xxl-2 p-3 d-flex flex-column justify-content-between" style="height: 100%;overflow: hidden;">
         <ul class="w-100 d-flex justify-content-center" style="list-style: none;padding-left: 0;gap: 32px;">
             <li id="monitor-border" class="border-bottom border-3 border-primary fs-6">
                 <a id="monitor" class="nav-link fw-bolder active text-primary" type="button">Giám sát</a>
@@ -206,24 +206,34 @@
 
         <!-- Giám sát -->
         <div id="monitor-view" class="w-100 h-100 mt-2">
-            <!-- <div class="mb-3 fs-6">
-                <label class="form-label" for="">Nhập mã tàu:</label>
-                <input type="text" class="form-control" placeholder="BĐ-12312">
-            </div>
             <div class="mb-3 fs-6">
+                <label class="form-label" for="">Nhập mã tàu:</label>
+                <input type="text" class="form-control" placeholder="BĐ-12312-TS">
+            </div>
+            <!-- <div class="mb-3 fs-6">
                 <button class="btn btn-primary" type="button">Tìm kiếm</button>
             </div> -->
-            <div class="mb-3 fs-6 text-white p-3 rounded" style="overflow-y: auto;height: 75%;background-color: #5F5D9C;">
+            <div class="mb-3 fs-6 text-white p-3 rounded" style="overflow-y: auto;height: 65%;background-color: #5F5D9C;">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" data-id="all-ships" id="all-ship-input">
+                    <label class="form-check-label" for="all-ship-input">
+                      Tất cả tàu
+                    </label>
+                </div>
                 {% for ship in ships %}
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="flexRadioDefault" data-id="{{ship.SoDangKy}}" id="{{ship.SoDangKy}}">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" data-pk="{{ship.ID}}" data-id="{{ship.SoDangKy}}" id="{{ship.SoDangKy}}">
                     <label class="form-check-label" for="{{ship.SoDangKy}}">
                       {{ship.SoDangKy}}
                     </label>
                 </div>
                 {% endfor %}
-                
             </div>
+            {% if request.user.user_type == '1' or request.user.is_staff %}
+            <div class="mb-3 fs-6">
+                <a href="{% url 'download-all-location' %}" class="btn btn-primary">Tải xuống vị trí</a>
+            </div>
+            {% endif %}
         </div>
 
         <!-- Xem lại -->
@@ -255,13 +265,13 @@
 
         <!-- Legend -->
         <div id="legend" class="fs-6" style="background-color: white;padding: 12px;margin: 8px;border-radius: 6px;">
-            <p class="fs-6 mb-1">Tổng số tàu: {{ship_counter}}</p>
+            <p class="fs-6 mb-1">Tổng số tàu: {{total_ship}}</p>
             <p class="fs-6 mb-1">Đang hoạt động: {{ship_counter}}</p>
-            <p class="fs-6 mb-1">Neo: {{ship_counter}}</p>
+            <p class="fs-6 mb-1">Không có thông tin: {{off_ship}}</p>
         </div>
 
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDejFrO4ZF5CMrlyjM1ieDQjgWuxIkp95U&callback=initMap&loading=async" defer></script>
-        <script src="{% static 'assets/js/google-map.js' %}"></script>
+        <script src="{% static 'assets/js/index.js' %}"></script>
     </div>
 </div>
 

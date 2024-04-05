@@ -1513,29 +1513,3 @@ def mining_log(request):
         ]
     }, status=200)
     
-
-
-# RESTful API
-@login_required(login_url='/login/')
-def get_location_view_api(request, pk):
-    try:
-        ship = BangTau.objects.get(pk=pk)
-    except Exception as e:
-        return JsonResponse({
-            'status': 404,
-            'message': 'Ship not Found!',
-            'bundle': {}
-        }, status=404)
-
-    location = BangViTriTau.objects.filter(IDTau=ship).order_by('-Ngay')[0]
-    return JsonResponse({
-        'status': 200,
-        'message': f'Get info of ship: {ship.SoDangKy} successfully!',
-        'bundle': {
-            'shipowner': ship.IDChuTau.HoTen,
-            'captain': ship.IDThuyenTruong.HoTen,
-            'lat': location.ViDo,
-            'lng': location.KinhDo,
-            'date': location.Ngay,
-        }
-    }, status=200)
