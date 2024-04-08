@@ -183,5 +183,4 @@ sử dụng jsPDF
 
 
 
-phần edit ẩn số đăng ký tàu
-phần location cần xử lý
+Phần device view hoàn thiện 100% và test thành công 100% trừ phần xác định tàu cập cảng

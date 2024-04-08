@@ -34,8 +34,8 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" id="cancel-modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="submit-modal">Confirm</button>
+                <button type="button" class="btn btn-danger" id="cancel-modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="submit-modal">Xác nhận</button>
             </div>
         </div>
     </div>
@@ -159,6 +159,7 @@
                                 </button>
                                 
                                 <a class="btn btn-warning" href="{% url 'edit-device' item.ID %}"><i class="fa-regular fa-pen-to-square"></i></a>
+                                
                                 <button class="btn btn-dark modal-button" data-command="trash" data-comfirm="{{item.SoDangKy}}" data-pk="{{item.ID}}">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>

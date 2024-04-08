@@ -505,10 +505,6 @@ def search_device_view(request):
                     items.append(item)
             if len(items) == 0:
                 messages.info(request, f'Không tìm thấy thông tin thiết bị hợp lệ!')
-        elif query_type == '6':
-            items = BangTau.objects.filter((Q(IMO__icontains=query) & Q(CangCaDangKy=request.user.staff.cangca)) | (Q(SoDangKy__icontains=query) & Q(CangCaDangKy=request.user.staff.cangca))).order_by('SoDangKy')  
-            if len(items) == 0:
-                messages.info(request, f'Không tìm thấy thông tin IMO hoặc Số đăng ký hợp lệ!')
         else:
             items = BangTau.objects.filter(Q(CangCaDangKy=request.user.staff.cangca)).order_by('HoTen')
     
@@ -622,4 +618,52 @@ def download_device_data(request, number):
     response = HttpResponse(excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename="ships_data.xlsx"'
     return response
+
+
+@login_required(login_url='/login/')
+def get_ship_location_by_id_api(request, pk):
+    try:
+        if request.user.user_type == '1' or request.user.is_staff:
+            ship = BangTau.objects.get(pk=pk)
+        elif request.user.user_type == '2':
+            ship = BangTau.objects.get(pk=pk, CangCaDangKy=request.user.staff.cangca) 
+        else:
+            print("Here")
+            return JsonResponse({
+                'message': 'Permission not allowed',
+                'status': 403, 
+                'bundle': {},
+                'success': False
+            })
+    except BangTau.DoesNotExist:
+        print("Here 2: ", e)
+        return JsonResponse({
+            'status': 404,
+            'message': 'Ship not found!',
+            'bundle': {},
+            'success': False
+        }, status=404)
+
+    location = BangViTriTau.objects.filter(IDTau=ship).order_by('-Ngay').first()
+    if location is not None:
+        return JsonResponse({
+            'status': 200,
+            'message': f'Get info of ship: ShipID {ship.pk} successfully!',
+            'bundle': {
+                'shipowner': ship.IDChuTau.HoTen,
+                'captain': ship.IDThuyenTruong.HoTen,
+                'lat': location.ViDo,
+                'lng': location.KinhDo,
+                'date': f"{location.Ngay.hour}:{location.Ngay.minute}:{location.Ngay.second} Ngày {location.Ngay.day} tháng {location.Ngay.month} năm {location.Ngay.year}",
+                'SoDangKy': ship.SoDangKy,
+            },
+            'success': True
+        }, status=200) 
+    else:
+        return JsonResponse({
+            'status': 200,
+            'message': 'Ship not found!',
+            'bundle': {},
+            'success': False
+        }, status=200)
     

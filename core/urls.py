@@ -65,7 +65,8 @@ urlpatterns += [
 
 # RESTful API
 urlpatterns += [
-    path('api/location/<SoDangKy>/', get_ship_location_api, name='get-location-api'),
+    path('api/location/<str:SoDangKy>/', get_ship_location_api, name='get-location-api'),
+    path('api/device-location/<int:pk>/', get_ship_location_by_id_api, name='get-device-location-api'),
     path('api/all-location/', get_all_location_api, name='all-location'),
     path('api/get-marine-log/', get_history_ship_location_api, name='marine-log-api'),
 ]
