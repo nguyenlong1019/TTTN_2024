@@ -182,7 +182,6 @@ sử dụng jsPDF
 {% if item.bangvitritau_set.exists %} 
 
 
-bug phần search chủ tàu, thuyền trưởng trong device 
-ẩn search IMO và số đăng ký, 
+
 phần edit ẩn số đăng ký tàu
 phần location cần xử lý

@@ -55,7 +55,9 @@
                 <option value="3">Tên chủ tàu</option>
                 <option value="4">Tên thuyền trưởng</option>
                 <option value="5">Mã thiết bị nhật ký</option>
+                {% if request.user.user_type == '1' or request.user.is_staff %}
                 <option value="6">IMO và Số đăng ký</option>
+                {% endif %}
             </select>
         </div>
         <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
@@ -215,7 +217,7 @@
         </table>
         
         <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
+            <ul class="pagination justify-content-center" style="margin-bottom: 0.5rem;">
                 {% if ships.has_previous %}
                     <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
                     <li class="page-item"><a class="page-link" href="?page={{ ships.previous_page_number }}">Previous</a></li>

@@ -63,6 +63,7 @@ def check_id_valid(id):
     if ship is not None:
         return False
     return True 
+    # trả về false nếu đã tồn tại ngược lại trả về true
 
 
 @login_required(login_url='/login/')
@@ -308,13 +309,20 @@ def edit_device_view(request, pk):
                 messages.info(request, "Thông tin tàu không tồn tại!!!")
                 return redirect('edit-device', pk)
 
-            if ship.SoDangKy != SoDangKy:
-                # Xử lý số đăng ký trùng hay không
-                if not check_id_valid(SoDangKy):
-                    messages.info(request, "Số đăng ký tàu đã tồn tại!!!")
-                    return redirect('edit-device', pk)
-                else:
-                    ship.SoDangKy=SoDangKy
+            if request.user.user_type == '2':
+                if ship.SoDangKy != SoDangKy:
+                    if check_id_valid(SoDangKy):
+                        ship.SoDangKy = SoDangKy
+                        ship.TenTau = SoDangKy
+            else:
+                if ship.SoDangKy != SoDangKy:
+                    # Xử lý số đăng ký trùng hay không
+                    if not check_id_valid(SoDangKy):
+                        messages.info(request, "Số đăng ký tàu đã tồn tại!!!")
+                        return redirect('edit-device', pk)
+                    else:
+                        ship.SoDangKy=SoDangKy
+                ship.TenTau=TenTau
 
             tbnkkt = ship.IDDevice
             tbnkkt.is_active = False
@@ -324,7 +332,6 @@ def edit_device_view(request, pk):
             captain.hasShip = False
             captain.save()
 
-            ship.TenTau=TenTau
             ship.HoHieu=HoHieu
             ship.CoHieu=CoHieu
             ship.IMO=IMO
