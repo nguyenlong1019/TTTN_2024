@@ -1,0 +1,15 @@
+Tài khoản Level 1 (Chi cục thủy sản)
+Account 1:
+username: admin01 | password: @AdminD10192024
+username: admin02 | password: @Admin02a2024
+username: admin03 | password: @Admin03D1019@
+
+Tài khoản Level 2 (Quản lý cảng)
+username: userAd201 | password: AdUser@012024
+username: userAd202 | password: AdUser@022024
+username: userAd203 | password: AdUser@032024
+
+Tài khoản Level 3 (Cung cấp thiết bị nhật ký khai thác)
+username: userAd301 | password: AdUser3@012024
+username: userAd302 | password: AdUser3@022024
+username: userAd303 | password: AdUser3@032024

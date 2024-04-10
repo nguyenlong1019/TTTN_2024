@@ -10,7 +10,7 @@ const shipInfoBox = document.getElementById('search-info');
 function initMap() {
     let map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 13.678354, lng: 111.400118}, // tọa độ trung tâm
-        zoom: 8,
+        zoom: 15, // zoom max là 22
     });
 
     // thêm polyline
@@ -151,14 +151,6 @@ function initMap() {
         marineLogLine.setMap(map);
 
         let markers = [];
-        for (let i = 0; i < marineLogCoordinates.length - 1; i++) {
-            let marker = new google.maps.Marker({
-                position: marineLogCoordinates[i],
-                map: map,
-                title: `Vị trì tàu ${info.SoDangKy} ngày ${locationData[i].Ngay}`,
-            });
-            markers.push(marker);
-        }
 
         if (marineLogCoordinates.length > 0) {
             let lastPosition = marineLogCoordinates[marineLogCoordinates.length - 1];
@@ -190,6 +182,35 @@ function initMap() {
                 infoWindow.open(map, lastMarker);
             });
         }
+
+
+        if (marineLogCoordinates.length >= 2) {
+            let firstPosition = marineLogCoordinates[0];
+            let firstMarker = new google.maps.Marker({
+                position: firstPosition,
+                map: map,
+                title: `Vị trí tàu ${info.SoDangKy} ngày ${locationData[0].Ngay}`,
+            });
+            markers.push(firstMarker);
+        }
+
+        if (marineLogCoordinates.length >= 3)
+        {
+            for (let i = 1; i < marineLogCoordinates.length - 1; i++) {
+                let marker = new google.maps.Marker({
+                    position: marineLogCoordinates[i],
+                    map: map,
+                    title: `Vị trì tàu ${info.SoDangKy} ngày ${locationData[i].Ngay}`,
+                    icon: {
+                        url: '/static/assets/imgs/dot.png',
+                        scaledSize: new google.maps.Size(5, 5),
+                    }
+                });
+                markers.push(marker);
+            }
+        }
+
+        
 
 
     })

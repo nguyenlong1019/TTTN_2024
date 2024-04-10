@@ -7,7 +7,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save 
 from django.dispatch import receiver
 
-
 class CustomUser(AbstractUser):
     user_type_data = (
         (1, "Admin"),
@@ -545,6 +544,8 @@ class BangTau(models.Model):
     ) 
     ThongSoNguCu = models.CharField(max_length=255, null=False, 
         default='', help_text='Thông số ngư cụ')
+
+    is_anchor = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "Bảng tàu"

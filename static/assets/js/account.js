@@ -25,13 +25,14 @@ modalBtns.forEach(modalBtn => modalBtn.addEventListener('click', () => {
     const pk = modalBtn.getAttribute('data-pk');
     const username = modalBtn.getAttribute('data-username');
     const email = modalBtn.getAttribute('data-email');
+    console.log(email);
 
-    modalTitle.innerHTML = `Xác nhận xóa thông tin user: ${username}`;
+    modalTitle.innerHTML = `Xác nhận xóa thông tin user: ${username} ?`;
     modalBody.innerHTML =  `
         <strong>Lưu ý: </strong>
         <ul>
             <li>Xác nhận xóa user với username: ${username}</li>
-            <li>Xác nhận xóa user với email: ${email}</li>
+            <li>Xác nhận xóa user với email: ${email ? email : 'Không có email'}</li>
         </ul>
     `;
 

@@ -13,6 +13,10 @@ const resetSearchBtn = document.getElementById('reset-search-device');
 const urlOrigin = window.location.origin;
 // console.log(urlOrigin);
 
+overlayElem.addEventListener('click', () => {
+    overlayElem.style.display = 'none';
+    modalElem.classList.remove('show-modal');
+});
 
 modalBtns.forEach(modalBtn => modalBtn.addEventListener('click', () => {
     const closeModalBtn = document.querySelector('.btn-close');
@@ -24,10 +28,11 @@ modalBtns.forEach(modalBtn => modalBtn.addEventListener('click', () => {
     const command = modalBtn.getAttribute('data-command');
     const title = modalBtn.getAttribute('data-comfirm'); // xác nhận xóa tàu hoặc xem vị trí tàu nào?
     if (command === 'location') {
-        modalTitle.innerHTML = `Vị trí tàu ${title}`;
         modalBody.style.display = 'block';
+        cancelModalBtn.style.display = 'none';
+        submitModalBtn.innerHTML = 'Xong'
 
-        let locationUrlApi = urlOrigin + `/api/location/${pk}/`;
+        let locationUrlApi = urlOrigin + `/api/device-location/${pk}/`;
         fetch(locationUrlApi)
         .then(response => {
             if (!response.ok) {
@@ -37,14 +42,24 @@ modalBtns.forEach(modalBtn => modalBtn.addEventListener('click', () => {
         })
         .then(data => {
             console.log(data);
-            const bundle = data.bundle;
-            modalBody.innerHTML = `
-                <p class="fs-6">Chủ tàu: <b>${bundle.shipowner}</b></p>
-                <p class="fs-6">Thuyền thưởng: <b>${bundle.captain}</b></p>
-                <p class="fs-6">Vĩ độ: <b>${bundle.lat}</b></p>
-                <p class="fs-6">Kinh độ: <b>${bundle.lng}</b></p>
-                <p class="fs-6">Thời gian cập nhật: <b>${bundle.date}</b> </p>
-            `;
+            let isSuccess = data.success;
+            // console.log(isSuccess);
+            if (isSuccess) {
+                modalTitle.innerHTML = `Thông tin vị trí tàu ${title}`;
+                const bundle = data.bundle;
+                modalBody.innerHTML = `
+                    <p class="fs-6">Chủ tàu: <b>${bundle.shipowner}</b></p>
+                    <p class="fs-6">Thuyền thưởng: <b>${bundle.captain}</b></p>
+                    <p class="fs-6">Vĩ độ: <b>${bundle.lat}</b></p>
+                    <p class="fs-6">Kinh độ: <b>${bundle.lng}</b></p>
+                    <p class="fs-6">Thời gian cập nhật: <b>${bundle.date}</b> </p>
+                `;
+            } else {
+                modalTitle.innerHTML = `Chưa có thông tin vị trí tàu ${title}`;
+                modalBody.innerHTML = `
+                    <p class="fs-6">Đảm bảo rằng thiết bị giám sát đang hoạt động trên tàu</p>
+                `;
+            }
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
@@ -53,6 +68,8 @@ modalBtns.forEach(modalBtn => modalBtn.addEventListener('click', () => {
     } else if (command === 'trash') {
         modalTitle.innerHTML = `Xác nhận xóa thông tin tàu ${title}?`;
         modalBody.style.display = 'none';
+        cancelModalBtn.style.display = 'initial';
+        submitModalBtn.innerHTML = 'Xác nhận'
         submitModalBtn.setAttribute('data-command', 'trash');
     }
     

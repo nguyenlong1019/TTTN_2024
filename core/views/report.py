@@ -5,13 +5,14 @@ from core.models import *
 
 from django.utils import timezone 
 from datetime import timedelta 
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q 
+from django.contrib import messages
 
 
 # Báo cáo thống kê
 @login_required(login_url='/login/')
 def report_view(request):
-    fishing_port = BangCangCa.objects.all()
+    fishing_port = BangCangCa.objects.all().order_by('Ten')
     titles = ["STT", "Tên Loài Cá", "Sản Lượng"]
 
     # Lấy thời điểm 24h trước 

@@ -7,15 +7,31 @@ from django.db.models import Q
 import random, json, operator
 from django.contrib import messages
 from django.http import JsonResponse
+from django.core.paginator import Paginator 
 
 
-# quản lý thông tin chủ tàu, thuyền trưởng
 @login_required(login_url='/login/')
 def shipowners_view(request):
-    if request.user.user_type == '1' or request.user.is_staff:
-        titles = ["STT", "Họ tên", "Số CMND(CCCD)", "Địa chỉ", "Trạm bờ", "Email", "Số điện thoại", "Người dùng", "Thao tác"]
-        captains = list(BangThuyenTruong.objects.all().order_by('HoTen'))
-        shipowners = list(BangChuTau.objects.all().order_by('HoTen'))
+    titles = ["STT", "Họ tên", "Số CMND(CCCD)", "Địa chỉ", "Trạm bờ", "Email", "Số điện thoại", "Người dùng", "Thao tác"]
+    if request.user.user_type == '1' or request.user.is_staff or request.user.user_type == '2':
+
+        if request.user.user_type == '2':
+            captains = []
+            shipowners = []
+            ships = BangTau.objects.filter(CangCaDangKy=request.user.staff.cangca)
+            if ships is not None:
+                for ship in ships:
+                    if ship.IDChuTau:
+                        shipowners.append(ship.IDChuTau)
+                    if ship.IDThuyenTruong:
+                        captains.append(ship.IDThuyenTruong)
+            captains = list(set(captains))
+            shipowners = list(set(shipowners))
+            captains = sorted(captains, key=operator.attrgetter('HoTen'))
+            shipowners = sorted(shipowners, key=operator.attrgetter('HoTen'))
+        else:
+            captains = list(BangThuyenTruong.objects.all().order_by('HoTen'))
+            shipowners = list(BangChuTau.objects.all().order_by('HoTen'))
 
         for captain in captains:
             captain.type = 'captain'
@@ -24,96 +40,104 @@ def shipowners_view(request):
         
         combined_list = captains + shipowners
         # random.shuffle(combined_list)
+        items_per_page = 7
+        p = Paginator(combined_list, items_per_page)
+        page = request.GET.get('page')
+        items = p.get_page(page)
+        current = items.number 
+        start = max(current - 2, 1)
+        end = min(current + 2, items.paginator.num_pages)
+        page_range = range(start, end)
+        start_number = (current - 1) * items_per_page
         return render(request, 'core/shipowners.html', {
             'titles': titles,
-            'items': combined_list,
-        }, status=200)
-    elif request.user.user_type == '2':
-        titles = ["STT", "Họ tên", "Số CMND(CCCD)", "Địa chỉ", "Trạm bờ", "Email", "Số điện thoại", "Người dùng", "Thao tác"]
-        captains = []
-        shipowners = []
-        ships = BangTau.objects.filter(CangCaDangKy=request.user.staff.cangca)
-        if ships is not None:
-            for ship in ships:
-                if ship.IDChuTau:
-                    shipowners.append(ship.IDChuTau)
-                if ship.IDThuyenTruong:
-                    captains.append(ship.IDThuyenTruong)
-        for captain in captains:
-            captain.type = 'captain'
-        for shipowner in shipowners:
-            shipowner.type = 'shipowner' 
-        
-        combined_list = list(set(captains)) + list(set(shipowners))
-        combined_list = sorted(combined_list, key=operator.attrgetter('HoTen'))
-        return render(request, 'core/shipowners.html', {
-            'titles': titles,
-            'items': combined_list,
+            'items': items,
+            'start': start, 
+            'end': end, 
+            'page_range': page_range,
+            'start_number': start_number
         }, status=200)
     else:
         return render(request, '403.html', {}, status=403) 
 
 
-# tìm kiếm thông tin chủ tàu, thuyền trưởng
 @login_required(login_url='/login/')
 def search_shipowners_view(request):
     query = request.GET.get('q')
     query_type = request.GET.get('query-type')
     titles = ["STT", "Họ tên", "Số CMND(CCCD)", "Địa chỉ", "Trạm bờ", "Email", "Số điện thoại", "Người dùng", "Thao tác"]
-    captains = list(BangThuyenTruong.objects.all())
-    shipowners = list(BangChuTau.objects.all())
+    captains = []
+    shipowners = []
+    if request.user.user_type == '1' or request.user.is_staff:
 
-    if query_type == '1':
-        captains = []
-        shipowners = list(BangChuTau.objects.filter(Q(HoTen__icontains=query)))
-        if len(captains) == 0 and len(shipowners) == 0:
-            messages.info(request, f"Không tìm thấy thông tin họ tên chủ tàu hợp lệ với query='{query}'")
-    elif query_type == '2':
-        captains = list(BangThuyenTruong.objects.filter(Q(HoTen__icontains=query)))
-        shipowners = []
-        if len(captains) == 0 and len(shipowners) == 0:
-            messages.info(request, f"Không tìm thấy thông tin họ tên thuyền trưởng hợp lệ với query='{query}'")
-    elif query_type == '3':
-        captains = []
-        shipowners = list(BangChuTau.objects.filter(Q(IDChuTau__icontains=query)))
-        if len(captains) == 0 and len(shipowners) == 0:
-            messages.info(request, f"Không tìm thấy thông tin mã chủ tàu hợp lệ với query='{query}'")
-    elif query_type == '4':
-        captains = list(BangThuyenTruong.objects.filter(Q(IDThuyenTruong__icontains=query)))
-        shipowners = []
-        if len(captains) == 0 and len(shipowners) == 0:
-            messages.info(request, f"Không tìm thấy thông tin mã thuyền trưởng hợp lệ với query='{query}'") 
-    elif query_type == '5':
-        captains = list(BangThuyenTruong.objects.filter(Q(CMND_CCCD__icontains=query)))
-        shipowners = list(BangChuTau.objects.filter(Q(CMND_CCCD__icontains=query)))
-        if len(captains) == 0 and len(shipowners) == 0:
-            messages.info(request, f"Không tìm thấy thông tin CMND/CCCD hợp lệ với query='{query}'") 
-    elif query_type == '6':
-        captains = list(BangThuyenTruong.objects.filter(Q(DienThoai__icontains=query)))
-        shipowners = list(BangChuTau.objects.filter(Q(DienThoai__icontains=query)))
-        if len(captains) == 0 and len(shipowners) == 0:
-            messages.info(request, f"Không tìm thấy thông tin số điện thoại hợp lệ với query='{query}'") 
-    elif query_type == '7':
-        captains = list(BangThuyenTruong.objects.filter(Q(HoTen__icontains=query) | Q(IDThuyenTruong__icontains=query) | Q(CMND_CCCD__icontains=query) | Q(DienThoai__icontains=query)))
-        shipowners = list(BangChuTau.objects.filter(Q(HoTen__icontains=query) | Q(IDChuTau__icontains=query) | Q(CMND_CCCD__icontains=query) | Q(DienThoai__icontains=query)))
-        if len(captains) == 0 and len(shipowners) == 0:
-            messages.info(request, f"Không tìm thấy thông tin truy vấn hợp lệ với query='{query}'") 
+        if query_type == '1':
+            shipowners = list(BangChuTau.objects.filter(Q(HoTen__icontains=query)))
+            if len(captains) == 0 and len(shipowners) == 0:
+                messages.info(request, f"Không tìm thấy thông tin họ tên chủ tàu hợp lệ với query='{query}'")
+        elif query_type == '2':
+            captains = list(BangThuyenTruong.objects.filter(Q(HoTen__icontains=query)))
+            if len(captains) == 0 and len(shipowners) == 0:
+                messages.info(request, f"Không tìm thấy thông tin họ tên thuyền trưởng hợp lệ với query='{query}'")
+        elif query_type == '3':
+            captains = list(BangThuyenTruong.objects.filter(Q(CMND_CCCD__icontains=query)))
+            shipowners = list(BangChuTau.objects.filter(Q(CMND_CCCD__icontains=query)))
+            if len(captains) == 0 and len(shipowners) == 0:
+                messages.info(request, f"Không tìm thấy thông tin CMND/CCCD hợp lệ với query='{query}'") 
+        elif query_type == '4':
+            captains = list(BangThuyenTruong.objects.filter(Q(DienThoai__icontains=query)))
+            shipowners = list(BangChuTau.objects.filter(Q(DienThoai__icontains=query)))
+            if len(captains) == 0 and len(shipowners) == 0:
+                messages.info(request, f"Không tìm thấy thông tin số điện thoại hợp lệ với query='{query}'") 
+        elif query_type == '5':
+            ships = BangTau.objects.filter(Q(SoDangKy__icontains=query))
+            # print(dir(ships[0]))
+            for ship in ships:
+                shipowner = ship.IDChuTau 
+                if shipowner:
+                    shipowners.append(shipowner)
+                captain = ship.IDThuyenTruong
+                if captain:
+                    captains.append(captain)
+            captains = list(set(captains))
+            shipowners = list(set(shipowners))
+            if len(captains) == 0 and len(shipowners) == 0:
+                messages.info(request, f"Không tìm thấy thông tin truy vấn hợp lệ với query='{query}'") 
+        else:
+            captains = list(BangThuyenTruong.objects.all())
+            shipowners = list(BangChuTau.objects.all())  
 
-
+    elif request.user.user_type == '2':
+        pass
+    else:
+        return render(request, '403.html', {}, status=403)
+    
+    
     for captain in captains:
         captain.type = 'captain'
     for shipowner in shipowners:
         shipowner.type = 'shipowner'
-
     combined_list = captains + shipowners
-    random.shuffle(combined_list)
+    combined_list = sorted(combined_list, key=operator.attrgetter('HoTen'))
+
+    items_per_page = 7
+    p = Paginator(combined_list, items_per_page)
+    page = request.GET.get('page')
+    items = p.get_page(page)
+    current = items.number 
+    start = max(current - 2, 1)
+    end = min(current + 2, items.paginator.num_pages)
+    page_range = range(start, end)
+    start_number = (current - 1) * items_per_page
     return render(request, 'core/shipowners.html', {
         'titles': titles,
-        'items': combined_list,
+        'items': items,
+        'start': start, 
+        'end': end, 
+        'page_range': page_range,
+        'start_number': start_number
     }, status=200)
 
 
-# thêm chủ tàu, thuyền trưởng
 @login_required(login_url='/login/')
 def add_shipowners_view(request):
     if request.method == 'POST':
@@ -166,7 +190,6 @@ def add_shipowners_view(request):
     }, status=200) 
 
 
-# sửa thông tin chủ tàu, thuyền trưởng
 @login_required(login_url='/login/')
 def edit_shipowners_view(request, pk, user_type):
     if request.method == 'POST':
@@ -247,7 +270,6 @@ def edit_shipowners_view(request, pk, user_type):
         return redirect('shipowners-view') 
 
 
-# xóa thông tin tàu hoặc thuyền trưởng
 @login_required(login_url='/login/')
 def delete_shipowners_view(request, pk):
     if request.method == 'POST':

@@ -10,7 +10,7 @@
 </div>
 {% endif %}
 
-<form method="POST">
+<form method="POST" onsubmit="return validateForm()">
     {% csrf_token %}
 
 <div class="row mt-1 mb-2">
@@ -88,5 +88,19 @@
 </div>
 
 </form>
+
+<script>
+    function validateForm() {
+        let dateOfBirth = new Date(document.getElementById('ngaySinh').value);
+        let today = new Date();
+        // console.log(dateOfBirth);
+        // console.log(today);
+        if (dateOfBirth > today) {
+            alert("Ngày sinh không được trong tương lai!!!");
+            return false;
+        }
+        return true;
+    }
+</script>
 
 {% endblock content %}

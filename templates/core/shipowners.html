@@ -49,11 +49,11 @@
             <select type="text" name="query-type" class="form-select form-select-sm" id="filter-shipowners">
                 <option value="1">Chủ tàu</option>
                 <option value="2">Thuyền trưởng</option>
-                <option value="3">Mã chủ tàu</option>
-                <option value="4">Mã thuyền trưởng</option>
-                <option value="5">Số CMND (CCCD)</option>
-                <option value="6">Số điện thoại</option>
-                <option value="7">All</option>
+                <option value="3">Số CMND (CCCD)</option>
+                <option value="4">Số điện thoại</option>
+                {% if request.user.user_type == '1' or request.user.is_staff %}
+                <option value="5">Số đăng ký tàu</option>
+                {% endif %}
             </select>
         </div>
         <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
@@ -80,7 +80,7 @@
     </div>
 </div>
 
-<div class="row bg-info-subtle rounded p-2 mt-2 fs-6" style="height: 70vh;overflow-y: auto;">
+<div class="row bg-info-subtle rounded p-2 mt-2 fs-6" style="height: 69vh;overflow-y: auto;">
     <div class="col-12">
         <table class="table table-hover shadow" style="overflow-y: auto;">
             <thead>
@@ -93,11 +93,12 @@
                 </tr>
             </thead>
             <tbody>
+                {% with start_number=start_number %}
                 {% for item in items %}
                     {% if forloop.counter|divisibleby:2 %}
                         <tr class="fs-6 bg-info-subtle">
                             <th class="bg-info-subtle text-dark text-center fw-semi" scope="row">
-                                {{forloop.counter}}
+                                {{forloop.counter|add:start_number}}
                             </th>
                             <td class="bg-info-subtle text-dark text-center">
                                 {{item.HoTen}}
@@ -138,7 +139,7 @@
                     {% else %}
                         <tr class="fs-6 bg-light">
                             <th class="bg-light text-dark text-center fw-semi" scope="row">
-                                {{forloop.counter}}
+                                {{forloop.counter|add:start_number}}
                             </th>
                             <td class="bg-light text-dark text-center">
                                 {{item.HoTen}}
@@ -178,8 +179,28 @@
                         </tr>
                     {% endif %}
                 {% endfor %}
+                {% endwith %}
             </tbody>
         </table>
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center" style="margin-bottom: 0.5rem;">
+                {% if items.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ items.previous_page_number }}">Previous</a></li>
+                {% endif %}
+
+                {% for num in page_range %}
+                    <li class="page-item {% if num == items.number %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endfor %}
+        
+                {% if items.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ items.next_page_number }}">Next</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ items.paginator.num_pages }}">Last &raquo;</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        
     </div>
 </div>
 

@@ -55,7 +55,11 @@
                         </div>
                         <div class="mb-3">
                             <label class="mb-2 fs-5 form-label" for="password-login">Mật khẩu: </label>
-                            <input type="password" class="form-control border-info" name="password" id="password-login"/>
+                            <!-- <input type="password" class="form-control border-info" name="password" id="password-login"/> -->
+                            <div class="form-control d-flex border border-1 border-info" style="box-sizing: border-box;">
+                                <input name="password" id="password-login" type="password" style="width: 90%;border: none;outline: none;" required>
+                                <img src="{% static 'assets/imgs/eye-close.png' %}" style="width: 30px;cursor: pointer;" alt="eye" id="eyeicon">
+                            </div>
                             {% if message %}
                             <div class="alert alert-warning alert-dismissible mt-2 mb-2" role="alert">
                                 <div>{{message}}</div>
@@ -118,6 +122,23 @@
             </div>
         </div>
     </div> -->
+
+    <script>
+
+        let eyeicon = document.getElementById('eyeicon');
+        let password = document.getElementById('password-login');
+    
+        eyeicon.onclick = function() {
+            if (password.type == 'password') {
+                password.type = 'text';
+                eyeicon.src = "/static/assets/imgs/eye-open.png";
+            } else {
+                password.type = 'password';
+                eyeicon.src = "/static/assets/imgs/eye-close.png";
+            }
+        }
+    
+    </script>
     
 
     <!-- Bootstrap 5 -->

@@ -506,7 +506,7 @@ def search_device_view(request):
             if len(items) == 0:
                 messages.info(request, f'Không tìm thấy thông tin thiết bị hợp lệ!')
         else:
-            items = BangTau.objects.filter(Q(CangCaDangKy=request.user.staff.cangca)).order_by('HoTen')
+            items = BangTau.objects.filter(Q(CangCaDangKy=request.user.staff.cangca)).order_by('SoDangKy')
     
     else:
         return render(request, '403.html', {}, status=403)

@@ -3,8 +3,7 @@ check email hợp lệ
 xóa chủ tàu hoặc thuyền trưởng thì set null trong tàu 
 số cmnd và số điện thoại và email là duy nhất, xử lý sâu hơn nữa là check số cmnd và check sđt hợp lệ, 
 
-Phần hải trình:
-chỉ hiển thị lên map các tàu đã có vị trí để chánh lỗi 
+Phần hải trình: 
 đối với phần quản lý hải trình chỗ giám sát, làm auto completed và bỏ đi button tìm kiếm, fix bug bảng legend không hiển thị 
 tìm kiếm nếu ngày không có lịch sử hải trình thì thông báo cho user 
 
@@ -13,85 +12,32 @@ chỉ hiển thị lên danh sách nhật ký mới nhất, nếu search thì m�
 thực hiện các hàm đủ 
 Hoàn thiện phần nhật ký
 
-Phần quản lý thiết bị: sửa ID, STT 
-
-Hoàn thiện phần quản lý tài khoản, phân quyền 
-Click vào avatar cũng có phần logout 
-
-Hoàn thiện phần báo cáo 
-
-
 Một số lưu ý khi triển khai lên VPS
 font times cần copy vào 
 api key phải hiển thị chứ không truyền qua biến
 
-
-Bug phần message cần sửa tại một số trang
-Tiếp theo là phân quyền trên api và một số trang 
-
 Xa hơn là api key của user đối với app mobile 
-
-thiết kế logic mới là đối với messages sẵn của django sẽ chuyển hướng về trang chính: ví dụ add ship sẽ về trang quản lý ship 
-còn submit form sẽ là alert trực tiếp với async và await fetch
 
 Bug user level 1 không đăng nhập được trang admin
 
-Tạm dừng phần edit account và xóa account 
-
-Sửa phần base
-
-Còn bug phần vị trí và xóa với thiết bị tàu? nên hiển thị là tàu với thiết bị nhật ký serial number = ...
-
 BUG dữ liệu thực tế:
-tại phần tìm history về hải trình, nhập 3 vị trí nhưng nó chỉ mark 2 vị trí (bug 1)
-tại phần nhập thông tin tàu mới cần phải sắp xếp lại phần cảng theo bảng chứ cái,
 thẻ select không hỗ trợ được nhiều nên cần phải sửa lại thành auto completed và 
-khi chọn vào input sẽ hiển thị dropdown cho phép chọn bảng cá
 
-A hoàng bảo web không phải giám sát nên cho nhật ký trên đầu (chưa thích làm)
-
-Thêm ssl 
-
-Phần tải xuống tại quản lý thiết bị đang bị bug (đã fix)
+A hoàng bảo web không phải giám sát nên cho nhật ký trên đầu (không mark được, nếu không là lỗi hết)
+cần suy xét liên kết view, template và url để sửa phần cho nhật ký lên trên đầu
 
 
-# docs.txt 
-Đã fix: phần thêm tàu và chỉnh sửa thông tin tàu cần sort chủ tàu, thuyền trưởng, cảng cá, mã thiết bị nhật ký khai thác 
-Trong view tàu sort theo số đăng ký 
-phần chủ tàu và thuyền trưởng view (sort theo tên và không xáo trộn)
-phần tài khoản (view) sort theo username và loại bỏ admin
-phần add new account sort phần cảng cá 
-phần report view sort cảng cá tìm kiếm. 
-đã sửa xong toàn bộ bug tý nữa cập nhật phần mềm.
-
-xử lý phần chủ tàu và thuyển trưởng có tàu trong cảng (cập nhật thành công)
-thay đổi 
-
-tiếp theo sửa phần thêm sửa xóa, các phần tìm kiếm cũng cần sort 
-tức là vẫn hiển thị hết lên nhưng sẽ phải xem xét là cái nào được xóa cái nào không? 
-nếu chưa có vị trí thì hiển thị chưa có vị trí cho tàu này 
-tách module riêng
 rename column và design lại toàn bộ cơ sở dữ liệu (ví dụ gộp 2 bảng chủ tàu và thuyền trưởng làm 1)
 
 
 Công việc tuần:
-Sửa đổi, cập nhật đồng bộ hóa database, thêm các bảng mới 
-Giải quyết lỗi kết quả truy vấn không theo thứ tự sắp xếp 
-Tái cấu trúc mã, chia nhỏ các models phục vụ cập nhật phần mềm
 Thêm bảo mật XSS, SQL Injection, Clickjacking 
 Đưa ra giải pháp PDF với JavaScript PDF 
-thêm một cột vào database để xác định tàu cập bến hay chưa và web sẽ chỉ tải một lần duy nhất 
-Phân trang database
+
 Sử dụng Pyjwt cho giải pháp user trên ứng dụng di động.
 clean API theo RESTful
 
 Sửa đổi database:
-Thay vì authenticate ở database để xác thực các trường thì nên xác thực tại phía client nữa 
-sửa đổi các quan hệ cho phép null hoặc là khi xóa chủ tàu hoặc thuyền trưởng sẽ thông báo rằng có xóa được không?  
-Đối với chủ tàu và thuyền trưởng thì số CMND và Số điện thoại và email phải là duy nhất (cũng check tại server vì không sét được trong database)
-
-Không tái cấu trúc được models vì lỗi, tái cấu trúc thành công views, viết tái cấu trúc views, template và sửa một số lỗi
-design lại trang đăng nhập :
 
 
 https://www.c-map.com/app/
@@ -148,15 +94,6 @@ App Android tĩnh
 
 clean code trước sau đó clean các thư mục 
 
-18:17 làm chức năng change password 
-Hide/Show password (18:51)
-https://www.youtube.com/watch?v=945xZpwy9w8
-
-Xem đến 7:56 (bắt đầu 8h đến 8h35)
-https://www.youtube.com/watch?v=N-PB-HMFmdo&list=PLCC34OHNcOtqW9BJmgQPPzUpJ8hl49AGy&index=18
-
-đến 15:27
-Phân trang như sau:
 <br>
 {{ships}}
 <br>
@@ -165,8 +102,6 @@ Has Next: {{ships.has_next}} <br>
 Current Page: {{ships.number}} <br>
 Number of Page: {{ships.paginator.num_pages}} <br>
 <hr><br>
-
-Xong phân trang hoàn thiện lúc 9h47
 
 
 PDF.js 
@@ -183,4 +118,35 @@ sử dụng jsPDF
 
 
 
-Phần device view hoàn thiện 100% và test thành công 100% trừ phần xác định tàu cập cảng
+Phần device view hoàn thiện 100% và test thành công 100% trừ phần xác định tàu cập cảng 
+
+
+https://leafletjs.com/examples/quick-start/
+
+https://leafletjs.com/examples/quick-start/
+
+https://leafletjs.com/download.html
+
+https://www.youtube.com/watch?v=oP4bCLtXIeY
+
+
+
+
+
+Phân quyền phần search của shipowners view 
+Phần add cần phân quyền (xác thực việc cmnd hợp lệ, unique và số điện thoại, email hợp lệ), thông báo lỗi messages tại view 
+Phân quyền phần edit 
+Xác định user ở tỉnh của cảng cá đăng ký 
+Thêm nữa check null toàn bộ hệ thống từ việc tìm kiếm đến hiển thị ra các view
+Phân quyền phần xóa, xử lý xóa null :) (xác định xóa là bug toàn hệ thống vì chưa kiểm tra null của chủ tàu và thuyền trưởng)
+Trong bảng tàu đã cho phép null => cần set tại bảng tàu bằng null trước 
+
+phần mark như sau:
+nếu có 1 vị trí (đánh dấu vị trí hiện tại là Last(icon tàu))
+nếu có 2 vị trí (vị trí đầu mark đỏ, vị trí cuối là con tàu)
+nếu có hơn 2 vị trí (vị trí đầu mark đỏ, các vị trí giữa là dấu chấm, vị trí cuối là icon tàu)
+sửa lại code của search vị trí
+
+Trung bình 15 mẻ lưới 
+
+https://www.blog.pythonlibrary.org/2013/08/12/reportlab-how-to-add-page-numbers

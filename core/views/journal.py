@@ -17,9 +17,52 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.units import cm 
 from reportlab.platypus import Frame, Paragraph, Table, TableStyle, Spacer
 
+from collections import defaultdict
+from datetime import datetime
+
 
 @login_required(login_url='/login/')
 def journal_test_view(request):
+    journal = BangNhatKy.objects.get(pk=8)
+    print(journal)
+    nets = BangMeLuoi.objects.filter(IDChuyenBien=journal.IDChuyenBien)
+    print(nets)
+
+    # tạo một từ điển để lưu tổng số lượng của từng loài cá
+    species_totals = defaultdict(int) # species: giống loài
+
+    # duyệt qua danh sách các mẻ lưới
+    for net in nets:
+        species_in_net = BangLoaiCaDuocDanhBatTrongMeLuoi.objects.filter(IDMeLuoi=net)
+
+        for species in species_in_net:
+            species_totals[species.IDLoaiCa] += species.SanLuong 
+    top_6_species = sorted(species_totals.items(), key=lambda x: x[1], reverse=True)[:6]
+    top_6_species_name = [BangLoaiCaDanhBat.objects.get(ID=species_id.ID).Ten for species_id, _ in top_6_species]
+
+    quantity_matrix = []
+    for net in nets:
+        net_quantities = []
+        species_in_net = BangLoaiCaDuocDanhBatTrongMeLuoi.objects.filter(IDMeLuoi=net)
+
+        for species_id, _ in top_6_species:
+            quantity = next((species.SanLuong for species in species_in_net if species.IDLoaiCa == species_id), 0)
+            net_quantities.append(quantity)
+
+        quantity_matrix.append(net_quantities)
+
+    # In ra tên của 6 loài cá
+    print("Tên của 6 loài cá có tổng sản lượng nhiều nhất:")
+    print(top_6_species_name)
+
+    # In ra mảng hai chiều
+    print("Sản lượng của từng loài cá trong từng mẻ lưới:")
+    for row in quantity_matrix:
+        print(row)
+
+    # lấy ra tên 6 loài cá
+    # lấy ra sản lượng trong từng mẻ lưới của loài cá 
+
     return render(request, 'journal-test.html', {})
 
 
@@ -150,8 +193,8 @@ def generate_journal_pdf(request, pk):
 
     flow_obj1.append(Paragraph(f"1. Họ và tên chủ tàu: {ediary.IDThietBi.IDChuTau.HoTen}.................; 2. Họ và tên thuyền trưởng: {ediary.IDThietBi.IDThuyenTruong.HoTen}..................", paragraph_normal))
     flow_obj1.append(Paragraph(f"3. Số đăng ký tàu: {ediary.IDThietBi.SoDangKy}.....; 4. Chiều dài lớn nhất của tàu: {ediary.IDThietBi.ChieuDaiLonNhat} m; 5. Tổng công suất máy chính: {ediary.IDThietBi.CongSuatMay} KW", paragraph_normal))
-    flow_obj1.append(Paragraph(f"6. Số Giấy phép khai thác thủy sản: GP-120.................Thời hạn đến: 27/12/2039...........................................", paragraph_normal))
-    flow_obj1.append(Paragraph(f"7. Nghề phụ 1: {ediary.IDThietBi.NghePhu1.Ten}..; 8. Nghề phụ 2: Đánh bắt cá ngừ.....................................", paragraph_normal))
+    flow_obj1.append(Paragraph(f"6. Số Giấy phép khai thác thủy sản: .......................Thời hạn đến: .....................................................", paragraph_normal))
+    flow_obj1.append(Paragraph(f"7. Nghề phụ 1: {ediary.IDThietBi.NghePhu1.Ten}..; 8. Nghề phụ 2: .......................................", paragraph_normal))
     flow_obj1.append(Paragraph(f"9. Kích thước chủ yếu của ngư cụ (ghi cụ thể theo nghề chính): ", paragraph_normal))
     flow_obj1.append(Paragraph(f"a) Nghề câu: Chiều dài toàn bộ vàng câu: ................m; Số lưỡi câu: ..................................................lưỡi", paragraph_normal))
     flow_obj1.append(Paragraph(f"b) Nghề lưới vây, rê: Chiều dài toàn bộ lưới: ...........m; Chiều cao lưới: ..................................................m", paragraph_normal))
@@ -179,6 +222,7 @@ def generate_journal_pdf(request, pk):
     paragrap_bold.alignment = 0
 
     flow_obj2.append(Paragraph(f"Chuyến biển số: {ediary.IDChuyenBien.ChuyenBienSo}...........", paragrap_bold))
+    flow_obj2.append(Paragraph(f"{ediary.IDChuyenBien.ChuyenBienSo}/{datetime.now().year}", h2))
 
 
     frame2.addFromList(flow_obj2, pdf)
@@ -230,19 +274,47 @@ def generate_journal_pdf(request, pk):
     # print(colWidths)
 
     sea_trip = ediary.IDChuyenBien
-    net_list = BangMeLuoi.objects.filter(IDChuyenBien=sea_trip).order_by('MeLuoiSo')[:3]
+    net_list = BangMeLuoi.objects.filter(IDChuyenBien=sea_trip).order_by('MeLuoiSo')
+    # sum_qty = []
+    # if net_list is not None:
+    #     for net in net_list:
+    #         sum = [0] * 6
+    #         fish_list = BangLoaiCaDuocDanhBatTrongMeLuoi.objects.filter(IDMeLuoi=net).order_by('-SanLuong')[:6]
+    #         # print(fish_list)
+            
+    #         if fish_list is not None:
+    #             for index, fish in enumerate(fish_list):
+    #                 sum[index] = fish.SanLuong
+    #         sum_qty.append(sum)
     sum_qty = []
     if net_list is not None:
+
+        # tạo một từ điển để lưu tổng số lượng của từng loài cá
+        species_totals = defaultdict(int) # species: giống loài
+
+        # duyệt qua danh sách các mẻ lưới
         for net in net_list:
-            sum = [0] * 6
-            fish_list = BangLoaiCaDuocDanhBatTrongMeLuoi.objects.filter(IDMeLuoi=net).order_by('-SanLuong')[:6]
-            # print(fish_list)
+            species_in_net = BangLoaiCaDuocDanhBatTrongMeLuoi.objects.filter(IDMeLuoi=net)
+
+            for species in species_in_net:
+                species_totals[species.IDLoaiCa] += species.SanLuong 
+        top_6_species = sorted(species_totals.items(), key=lambda x: x[1], reverse=True)[:6]
+        top_6_species_name = [BangLoaiCaDanhBat.objects.get(ID=species_id.ID).Ten for species_id, _ in top_6_species]
+
+        
+        for net in net_list:
+            net_quantities = []
+            species_in_net = BangLoaiCaDuocDanhBatTrongMeLuoi.objects.filter(IDMeLuoi=net)
+
+            for species_id, _ in top_6_species:
+                quantity = next((species.SanLuong for species in species_in_net if species.IDLoaiCa == species_id), 0)
+                net_quantities.append(quantity)
             
-            if fish_list is not None:
-                for index, fish in enumerate(fish_list):
-                    sum[index] = fish.SanLuong
-            sum_qty.append(sum)
-    print(sum_qty)
+            net_quantities += [0] * (6 - len(net_quantities))
+
+            sum_qty.append(net_quantities)
+
+    # print(sum_qty)
     tmp_list = []
     for i, item in enumerate(net_list):
         date_start = item.ThoiDiemThaNguCu
@@ -251,10 +323,14 @@ def generate_journal_pdf(request, pk):
         tmp_ = [i+1, f"{date_start.day}-{date_start.month}-{date_start.year}", f"{str(item.ViDoThaNguCu)[0:7]}", f"{str(item.KinhDoThaNguCu)[0:7]}", f"{date_end.day}-{date_end.month}-{date_end.year}", f"{str(item.ViDoThuNguCu)[0:7]}", f"{str(item.KinhDoThuNguCu)[0:7]}", f"{sum_qty[i][0]}", f"{sum_qty[i][1]}", f"{sum_qty[i][2]}", f"{sum_qty[i][3]}", f"{sum_qty[i][4]}", f"{sum_qty[i][5]}", item.TongSanLuong]
         tmp_list.append(tmp_)
     # print(tmp_list)
-
+    top6name = []
+    for item in top_6_species_name:
+        top6name.append(item.replace(" ", "\n"))
+    top6name += [''] * (6 - len(top6name))
+    # print(top6name)
     data = [
         ['Mẻ\nthứ', 'Thời \nđiểm bắt\nđầu thả', 'Vị trí thả', '', 'Thời\nđiểm kết\nthúc thu', 'Vị trí thu', '', 'Sản lượng các loài chủ yếu**(kg)', '', '', '', '', '', 'Tổng \nsản\nlượng\n(kg)'],
-        ['', '', 'Vĩ độ', 'Kinh độ', '', 'Vĩ độ', 'Kinh độ', 'Loài\n cá\n có\n 5\n chữ', 'Loài\n cá\n có\n khoảng\n 6\n chữ\n', 'Loài 3', 'Loài 4', 'Loài 5', 'Loài 6', ''],
+        ['', '', 'Vĩ độ', 'Kinh độ', '', 'Vĩ độ', 'Kinh độ', f'{top6name[0]}', f'{top6name[1]}', f'{top6name[2]}', f'{top6name[3]}', f'{top6name[4]}', f'{top6name[5]}', ''],
         ['', '', '', '', ''],
         ['', '', '', '', ''],
         ['', '', '', '', ''],
@@ -301,8 +377,21 @@ def generate_journal_pdf(request, pk):
     flow_obj4.append(table)
     flow_obj4.append(Spacer(1, 0.25*cm))
     flow_obj4.append(Paragraph("**Ghi các đối tượng khai thác chính theo từng nghề (Kéo, Rê, Vây, Câu, Chụp…). Đối với các nghề khai thác cá ngừ cần ghi rõ sản lượng của từng loài như: cá ngừ Vây vàng, cá ngừ Mắt to, cá ngừ Vằn (Sọc dưa), cá ngừ khác (Chù, ồ…).", paragraph_normal))
-    flow_obj4.append(Paragraph("2.Thông tin về các loài nguy cấp quý hiếm", paragrap_bold))
-    flow_obj4.append(Paragraph("Cá voi/Cá heo/Bò biển/Quản đồng/Vích/Đồi mồi dứa/Đồi mồi/Rùa da/Loài khác (Ghi tên cụ thể)", paragraph_normal))
+    
+    frame4.addFromList(flow_obj4, pdf)
+    pdf.showPage()
+
+    flow_obj6 = []
+    frame6 = Frame(
+        x1=2.5*cm,
+        y1=2.5*cm,
+        width=(page_width - 5*cm),
+        height=(page_height - 4*cm),
+        showBoundary=0
+    )
+
+    flow_obj6.append(Paragraph("2.Thông tin về các loài nguy cấp quý hiếm", paragrap_bold))
+    flow_obj6.append(Paragraph("Cá voi/Cá heo/Bò biển/Quản đồng/Vích/Đồi mồi dứa/Đồi mồi/Rùa da/Loài khác (Ghi tên cụ thể)", paragraph_normal))
 
     data2 = [
         ["Mẻ","Loài","Thời điểm\nbắt gặp", "Khối\nlượng/con\n(kg)", "Số lượng\nước tính", "Kích thước\nước tính\n(cm)", "Bắt gặp trong quá trình khai thác\n(chọn 1)", "", "", "Tình trạng bắt gặp (chọn 1)"],
@@ -333,13 +422,13 @@ def generate_journal_pdf(request, pk):
         ("SPAN", (9, 0), (11, 0)), # tình trạng bắt gặp
     ])
     table2.setStyle(tstyle2)
-    flow_obj4.append(table2)
-    flow_obj4.append(Spacer(1, 0.25*cm))
-    flow_obj4.append(Paragraph("Thông tin bổ sung về loài (nếu có): (Về màu sắc loài; thiết bị, thẻ gắn số trên cá thể;…và các thông tin khác nếu có)\n\
+    flow_obj6.append(table2)
+    flow_obj6.append(Spacer(1, 0.25*cm))
+    flow_obj6.append(Paragraph("Thông tin bổ sung về loài (nếu có): (Về màu sắc loài; thiết bị, thẻ gắn số trên cá thể;…và các thông tin khác nếu có)\n\
         ……………………………………………………………………………………………………………………………………………………\
     …………………………..………………………………………………………………………………………………………………………\
     ……………………………………………………………………………………….", style_normal))
-    frame4.addFromList(flow_obj4, pdf)
+    frame6.addFromList(flow_obj6, pdf)
     pdf.showPage()
 
     flow_obj5 = []
@@ -353,8 +442,8 @@ def generate_journal_pdf(request, pk):
 
     flow_obj5.append(Paragraph("II. THÔNG TIN VỀ HOẠT ĐỘNG CHUYỂN TẢI (nếu có)", h2_left))
     data3 = [
-        ["TT", "Ngày, tháng", "Thông tin tàu thu\nmua/chuyển tải", "", "Vị trí thu mua,\nchuyển tải", "", "Đã bán/chuyển tải", "", "Thuyền trưởng \ntàu thu mua,\nchuyểntải"],
-        ["", "", "Số đăng ký\ntàu", "Số giấy phép\nkhaithác", "Vĩ độ", "Kinh độ", "Tên loài\nthủy sản", "Khối lượng\n(kg)", ""],
+        ["TT", "Ngày, tháng", "Thông tin tàu thu\nmua/chuyển tải", "", "Vị trí thu mua,\nchuyển tải", "", "Đã bán/chuyển tải", "", "Thuyền trưởng \ntàu thu mua,\nchuyển tải"],
+        ["", "", "Số đăng ký\ntàu", "Số giấy phép\nkhai thác", "Vĩ độ", "Kinh độ", "Tên loài\nthủy sản", "Khối lượng\n(kg)", ""],
         ["", "", "", "", "", "", "", "", ""],
         ["", "", "", "", "", "", "", "", ""],
         ["", "", "", "", "", "", "", "", ""],
