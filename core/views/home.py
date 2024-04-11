@@ -8,7 +8,9 @@ from django.db.models import Q, Sum
 import json, tempfile
 from openpyxl import Workbook 
 from django.http import HttpResponse, JsonResponse  
-from django.contrib import messages
+from django.contrib import messages 
+
+from django.core.paginator import Paginator
 
 # Report view
 from django.utils import timezone 
@@ -26,10 +28,23 @@ def index(request):
     '''
     if request.user.user_type == '3':
         titles = ["STT", "Serial Number", "Ngày sản xuất", "Version", "Mã tàu", "Trạng thái", "Thao tác"]
-        equipments = BangThietBiNhatKyKhaiThac.objects.all().order_by('-ID')
+        equipments = BangThietBiNhatKyKhaiThac.objects.all().order_by('SerialNumber')
+        items_per_page = 7 
+        p = Paginator(equipments, items_per_page)
+        page = request.GET.get('page')
+        items = p.get_page(page)
+        current = items.number
+        start = max(current - 2, 1)
+        end = min(current + 2, items.paginator.num_pages)
+        page_range = range(start, end)
+        start_number = (current - 1) * items_per_page
         return render(request, 'core/index.html', {
             'titles': titles,
-            'items': equipments
+            'items': items,
+            'start': start, 
+            'end': end, 
+            'page_range': page_range,
+            'start_number': start_number
         }, status=200)
 
     if request.user.user_type == '1' or request.user.is_staff:

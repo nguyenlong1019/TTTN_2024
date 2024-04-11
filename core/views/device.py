@@ -60,7 +60,7 @@ def device_view(request):
 def check_id_valid(id):
     '''Kiểm tra số đăng ký tàu đã có hay chưa?'''
     ship = BangTau.objects.filter(SoDangKy=id)
-    if ship is not None:
+    if ship.exists():
         return False
     return True 
     # trả về false nếu đã tồn tại ngược lại trả về true
@@ -313,7 +313,8 @@ def edit_device_view(request, pk):
                 if ship.SoDangKy != SoDangKy:
                     if check_id_valid(SoDangKy):
                         ship.SoDangKy = SoDangKy
-                        ship.TenTau = SoDangKy
+                        ship.TenTau = SoDangKy 
+                    # Cần thêm else xử lý số đăng ký chưa được cập nhật (haizz bug mới)
             else:
                 if ship.SoDangKy != SoDangKy:
                     # Xử lý số đăng ký trùng hay không

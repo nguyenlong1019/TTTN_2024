@@ -150,3 +150,12 @@ sửa lại code của search vị trí
 Trung bình 15 mẻ lưới 
 
 https://www.blog.pythonlibrary.org/2013/08/12/reportlab-how-to-add-page-numbers
+
+Xử lý report trước: 
+Report sẽ là phần view cần cố định height và sửa lại thông tin, phân quyền
+
+# Cần thêm else xử lý số đăng ký chưa được cập nhật (haizz bug mới)
+
+
+Đối với user level 3: Oke phần index, add và edit còn phần search phân trang và 
+phần xóa cần thêm vài thiết bị và liên kết đến tàu để test :)

@@ -17,23 +17,30 @@ def report_view(request):
 
     # Lấy thời điểm 24h trước 
     time_threshold = timezone.now() - timedelta(hours=24)
+    print(time_threshold)
 
     # Lấy danh sách các mẻ lưới có thời gian thu ngư cụ trong khoảng 24h
     if request.user.user_type == '1' or request.user.is_staff:
-        bang_me_luoi_24h = BangMeLuoi.objects.filter(ThoiDiemThuNguCu__lte=time_threshold)
+        # tất cả mẻ lưới trong 24h qua
+        bang_me_luoi_24h = BangMeLuoi.objects.filter(ThoiDiemThuNguCu__gte=time_threshold)
     elif request.user.user_type == '2':
-        bang_me_luoi_24h = BangMeLuoi.objects.filter(ThoiDiemThuNguCu__lte=time_threshold)
+        # tất cả mẻ lưới trong 24h qua của các tàu đánh bắt
+        bang_me_luoi_24h = BangMeLuoi.objects.filter(ThoiDiemThuNguCu__gte=time_threshold)
     else:
         return render(request, '403.html', {}, status=403)
-    # print(bang_me_luoi_24h)
+    print(bang_me_luoi_24h)
     # Tính tổng sản lượng của mỗi loại cá được đánh bắt trong 24h
     items = (
         BangLoaiCaDuocDanhBatTrongMeLuoi.objects
         .filter(IDMeLuoi__in=bang_me_luoi_24h)
         .values('IDLoaiCa__Ten')
-        .annotate(tong_san_luong=Sum('SanLuong'))
+        .annotate(tong_san_luong=Sum('SanLuong'))  # annotate: thêm cột mới vào kết quả truy vấn
         .order_by('-tong_san_luong').all()
     )
+    print(dir(items[0]))
+    # print(items.query.field_names) # dùng trên object
+    print(items)
+    print(items[0].keys())
 
     return render(request, 'core/report.html', {
         'fishing_port': fishing_port,

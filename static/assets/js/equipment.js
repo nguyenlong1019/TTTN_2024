@@ -31,9 +31,10 @@ modalBtns.forEach(modalBtn => modalBtn.addEventListener('click', () => {
     modalBody.innerHTML =  `
         <strong>Lưu ý:</strong>
         <ul>
-            <li>Chỉ xóa các thiết bị chưa được kích hoạt</li>
-            <li>Xóa thiết bị đã kích hoạt sẽ ảnh hưởng đến thông tin tàu, nên cần thay đổi phía thiết bị trên tàu trước khi xóa</li>
-            <li>Đối với thiết bị đã kích hoạt cần thay đổi phía tàu trước khi xóa</li>
+            <li>Chỉ nên xóa các thiết bị chưa kích hoạt</li>
+            <li>Xóa thiết bị đã kích hoạt sẽ có thể gây ra lỗi thông tin tàu</li>
+            <li>Nên sửa thông tin thiết bị đã kích hoạt nếu nhập lỗi</li>
+            <li>Bắt buộc phải xóa thiết bị, nên xóa thông tin tàu liên quan trước</li>
         </ul>
     `;
 

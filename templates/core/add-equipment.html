@@ -15,6 +15,17 @@
     </div>
 </div>
 
+{% if messages %}
+
+    {% for message in messages %}
+    <div {% if message.tags %} class="alert-{{ message.tags }} alert alert-dismissible"{% endif %} role="alert">
+        <div>{{ message }}</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+
+{% endif %}
+
 <!-- <h4 class="fw-semi fs-6 mt-1">Thông Tin Chung</h4> -->
 <hr class="text-dark" />
 <div class="bg-info-subtle rounded p-3">
@@ -59,38 +70,6 @@
             return false;
         }
         return true;
-
-        // const requestData = {
-        //     'SerialNumber': document.getElementById('serialNumber').value;
-        // }
-
-        // try {
-        //     const response = await fetch('/equipment/check/', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value
-        //         },
-        //         body: JSON.stringify(requestData)
-        //     });
-    
-        //     if (response.ok) {
-        //         const responseData = await response.json();
-        //         if (responseData.success) {
-        //             return true;
-        //         } else {
-        //             return false;
-        //         }
-        //     } else {
-        //         console.error("Form validation failed: ", response.statusText);
-        //         alert('Error: Form validation failed, ', response.statusText);
-        //         return false;
-        //     }
-        // } catch (error) {
-        //     console.error("Error: ", error);
-        //     alert('Error: ', error);
-        //     return false;
-        // }
 
     }
 </script>
