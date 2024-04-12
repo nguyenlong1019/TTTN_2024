@@ -308,13 +308,18 @@ def edit_device_view(request, pk):
             except Exception as e:
                 messages.info(request, "Thông tin tàu không tồn tại!!!")
                 return redirect('edit-device', pk)
+            
+            # if SoDangKy != '' and SoDangKy != ship.SoDangKy:
+            #     pass 
 
             if request.user.user_type == '2':
                 if ship.SoDangKy != SoDangKy:
                     if check_id_valid(SoDangKy):
                         ship.SoDangKy = SoDangKy
                         ship.TenTau = SoDangKy 
-                    # Cần thêm else xử lý số đăng ký chưa được cập nhật (haizz bug mới)
+                    else:
+                        messages.info(request, "Số đăng ký tàu đã tồn tại!!!")
+                        return redirect('add-device')
             else:
                 if ship.SoDangKy != SoDangKy:
                     # Xử lý số đăng ký trùng hay không
@@ -583,12 +588,12 @@ def download_device_data(request, number):
                 ws[f"C{i}"] = "********"
             else:
                 ws[f"C{i}"] = ship.SoDangKy
-            ws[f"D{i}"] = ship.IDChuTau.HoTen
-            ws[f"E{i}"] = ship.IDChuTau.DienThoai
-            ws[f"F{i}"] = ship.IDChuTau.CMND_CCCD
-            ws[f"G{i}"] = ship.IDThuyenTruong.HoTen
+            ws[f"D{i}"] = ship.IDChuTau.HoTen if ship.IDChuTau else ''
+            ws[f"E{i}"] = ship.IDChuTau.DienThoai if ship.IDChuTau else ''
+            ws[f"F{i}"] = ship.IDChuTau.CMND_CCCD if ship.IDChuTau else ''
+            ws[f"G{i}"] = ship.IDThuyenTruong.HoTen if ship.IDThuyenTruong else ''
             ws[f"H{i}"] = ship.CangCaDangKy.Ten
-            ws[f"I{i}"] = ship.IDDevice.SerialNumber
+            ws[f"I{i}"] = ship.IDDevice.SerialNumber if ship.IDDevice else ''
             ws[f"J{i}"] = ship.LoaiTau.IDLoaiTau
             ws[f"K{i}"] = ship.NoiDangKy.TenTiengViet
         else:
@@ -651,8 +656,8 @@ def get_ship_location_by_id_api(request, pk):
             'status': 200,
             'message': f'Get info of ship: ShipID {ship.pk} successfully!',
             'bundle': {
-                'shipowner': ship.IDChuTau.HoTen,
-                'captain': ship.IDThuyenTruong.HoTen,
+                'shipowner': ship.IDChuTau.HoTen if ship.IDChuTau else '',
+                'captain': ship.IDThuyenTruong.HoTen if ship.IDThuyenTruong else '',
                 'lat': location.ViDo,
                 'lng': location.KinhDo,
                 'date': f"{location.Ngay.hour}:{location.Ngay.minute}:{location.Ngay.second} Ngày {location.Ngay.day} tháng {location.Ngay.month} năm {location.Ngay.year}",

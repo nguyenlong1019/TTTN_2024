@@ -26,12 +26,11 @@
         <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
             <select type="text" name="query-type" class="form-select form-select-sm" id="journal-search-select">
                 {% if request.user.user_type == '1' or request.user.is_staff %}
-                <option value="1">Mã tàu</option>
+                <option value="1">Số đăng ký tàu</option>
                 {% endif %}
-                <!-- <option value="2">Mã chủ tàu</option>
-                <option value="3">Mã thuyền trưởng</option> -->
+                <option value="2">Chủ tàu</option>
+                <option value="3">Thuyền trưởng</option>
                 <option value="4">Mã nhật ký</option>
-                <option value="5">Mã chuyến biển</option>
             </select>
         </div>
         <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
@@ -62,17 +61,24 @@
                 </tr>
             </thead>
             <tbody>
+                {% with start_number=start_number %}
                 {% for item in items %}
                     {% if forloop.counter|divisibleby:2 %}
                         <tr class="fs-6 bg-info-subtle">
                             <th class="bg-info-subtle text-dark text-center fw-semi" scope="row">
-                                {{forloop.counter}}
+                                {{forloop.counter|add:start_number}}
                             </th>
                             <td class="bg-info-subtle text-dark text-center">
                                 {% if request.user.user_type == '1' or request.user.is_staff %}
                                 {{item.IDThietBi.SoDangKy}}
                                 {% else %}
-                                ********
+                                
+                                    {% if item.IDThietBi.is_anchor %}
+                                    {{item.IDThietBi.SoDangKy}}
+                                    {% else %}
+                                    ********
+                                    {% endif %}
+
                                 {% endif %}
                             </td>
                             <td class="bg-info-subtle text-dark text-center">
@@ -92,21 +98,37 @@
                             </td>
                             
                             <td class="bg-info-subtle text-dark text-center">
+                                {% if request.user.user_type == '1' or request.user.is_staff %}
                                 <a href="{% url 'journal_pdf' item.ID %}" class="btn btn-secondary">
                                     <i class="fa-regular fa-eye"></i>
                                 </a>
+                                {% else %}
+                                    {% if item.IDThietBi.is_anchor %}
+                                    <a href="{% url 'journal_pdf' item.ID %}" class="btn btn-secondary">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </a>
+                                    {% else %}
+
+                                    {% endif %}
+                                {% endif %}
                             </td>
                         </tr>
                     {% else %}
                         <tr class="fs-6 bg-light">
                             <th class="bg-light text-dark text-center fw-semi" scope="row">
-                                {{forloop.counter}}
+                                {{forloop.counter|add:start_number}}
                             </th>
                             <td class="bg-light text-dark text-center">
                                 {% if request.user.user_type == '1' or request.user.is_staff %}
                                 {{item.IDThietBi.SoDangKy}}
                                 {% else %}
-                                ********
+                                
+                                    {% if item.IDThietBi.is_anchor %}
+                                    {{item.IDThietBi.SoDangKy}}
+                                    {% else %}
+                                    ********
+                                    {% endif %}
+
                                 {% endif %}
                             </td>
                             <td class="bg-light text-dark text-center">
@@ -125,15 +147,46 @@
                                 
                             </td>
                             <td class="bg-light text-dark text-center">
+                                {% if request.user.user_type == '1' or request.user.is_staff %}
                                 <a href="{% url 'journal_pdf' item.ID %}" class="btn btn-secondary">
                                     <i class="fa-regular fa-eye"></i>
                                 </a>
+                                {% else %}
+
+                                    {% if item.IDThietBi.is_anchor %}
+                                    <a href="{% url 'journal_pdf' item.ID %}" class="btn btn-secondary">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </a>
+                                    {% else %}
+
+                                    {% endif %}
+
+                                {% endif %}
                             </td>
                         </tr>
                     {% endif %}
                 {% endfor %}
+                {% endwith %}
             </tbody>
         </table>
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center" style="margin-bottom: 0.5rem;">
+                {% if items.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ items.previous_page_number }}">Previous</a></li>
+                {% endif %}
+
+                {% for num in page_range %}
+                    <li class="page-item {% if num == items.number %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endfor %}
+        
+                {% if items.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ items.next_page_number }}">Next</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ items.paginator.num_pages }}">Last &raquo;</a></li>
+                {% endif %}
+            </ul>
+        </nav>
     </div>
 </div>
 

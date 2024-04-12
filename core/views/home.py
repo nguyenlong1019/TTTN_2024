@@ -119,12 +119,21 @@ def get_all_location_api(request):
         new_loc = i.bangvitritau_set.order_by('-Ngay').first()
         ship_info = {
             'SoDangKy': i.SoDangKy,
-            'ChuTau': i.IDChuTau.HoTen,
-            'ThuyenTruong': i.IDThuyenTruong.HoTen,
             'ViDo': new_loc.ViDo,
             'KinhDo': new_loc.KinhDo,
             'NgayCapNhat': f"{new_loc.Ngay.hour}:{new_loc.Ngay.minute}:{new_loc.Ngay.second} Ngày {new_loc.Ngay.day} tháng {new_loc.Ngay.month} năm {new_loc.Ngay.year}",
         }
+        if i.IDChuTau:
+            ship_info['ChuTau'] = i.IDChuTau.HoTen
+        else:
+            ship_info['ChuTau'] = ''
+        
+        if i.IDThuyenTruong:
+            ship_info['ThuyenTruong'] = i.IDThuyenTruong.HoTen
+        else:
+            ship_info['ThuyenTruong'] = ''
+            
+
         info.append(ship_info)
     return JsonResponse({
         'status': 200,
@@ -160,17 +169,18 @@ def get_ship_location_api(request, SoDangKy):
         }, status=404)
 
     location = BangViTriTau.objects.filter(IDTau=ship).order_by('-Ngay')[0]
-    return JsonResponse({
-        'status': 200,
-        'message': f'Get info of ship: {ship.SoDangKy} successfully!',
-        'bundle': {
-            'shipowner': ship.IDChuTau.HoTen,
-            'captain': ship.IDThuyenTruong.HoTen,
+    bundle = {
             'lat': location.ViDo,
             'lng': location.KinhDo,
             'date': f"{location.Ngay.hour}:{location.Ngay.minute}:{location.Ngay.second} Ngày {location.Ngay.day} tháng {location.Ngay.month} năm {location.Ngay.year}",
             'SoDangKy': ship.SoDangKy,
-        }
+    }
+    bundle['shipowner'] = ship.IDChuTau.HoTen if ship.IDChuTau else ''
+    bundle['captain'] = ship.IDThuyenTruong.HoTen if ship.IDThuyenTruong else ''
+    return JsonResponse({
+        'status': 200,
+        'message': f'Get info of ship: {ship.SoDangKy} successfully!',
+        'bundle': bundle,
     }, status=200)
 
 
@@ -199,11 +209,11 @@ def download_realtime_all_location_view(request):
             location = ship.bangvitritau_set.order_by('-Ngay').first()
             ws[f"A{i}"] = i - 1
             ws[f"B{i}"] = ship.SoDangKy
-            ws[f"C{i}"] = ship.IDChuTau.HoTen
-            ws[f"D{i}"] = ship.IDChuTau.DienThoai
-            ws[f"E{i}"] = ship.IDThuyenTruong.HoTen
+            ws[f"C{i}"] = ship.IDChuTau.HoTen if ship.IDChuTau else ''
+            ws[f"D{i}"] = ship.IDChuTau.DienThoai if ship.IDChuTau else ''
+            ws[f"E{i}"] = ship.IDThuyenTruong.HoTen if ship.IDThuyenTruong else ''
             ws[f"F{i}"] = ship.CangCaDangKy.Ten
-            ws[f"G{i}"] = ship.IDDevice.SerialNumber
+            ws[f"G{i}"] = ship.IDDevice.SerialNumber if ship.IDDevice else ''
             ws[f"H{i}"] = location.ViDo
             ws[f"I{i}"] = location.KinhDo
             ws[f"J{i}"] = f"{location.Ngay.hour}:{location.Ngay.minute}:{location.Ngay.second} {location.Ngay.day}-{location.Ngay.month}-{location.Ngay.year}"
@@ -244,11 +254,6 @@ def change_password_view(request):
     
     return render(request, 'change-password.html', {})
 
-
-
-##########################################################################
-##### CLEAN CODE TO 234
-##########################################################################
 
 @login_required(login_url='/login/')
 def marine_diary_view(request):
@@ -323,28 +328,35 @@ def get_history_ship_location_api(request):
                 IDTau = ship
             ).order_by('Ngay').values('ViDo', 'KinhDo', 'Ngay')
             # print(location)
-            for loc in location:
-                loc['Ngay'] = loc['Ngay'].strftime('%Y-%m-%d %H:%M:%S')
-            # print(location)
+            if location.exists():
+                for loc in location:
+                    loc['Ngay'] = loc['Ngay'].strftime('%Y-%m-%d %H:%M:%S')
+                # print(location)
 
-            location_data = list(location)
+                location_data = list(location)
 
-            info = {
-                'SoDangKy': ship.SoDangKy,
-                'ChuTau': ship.IDChuTau.HoTen,
-                'ThuyenTruong': ship.IDThuyenTruong.HoTen,
-                'ViDo': location_data[-1]['ViDo'],
-                'KinhDo': location_data[-1]['KinhDo'],
-                'Ngay': location_data[-1]['Ngay']
-            }
+                info = {
+                    'SoDangKy': ship.SoDangKy,
+                    'ChuTau': ship.IDChuTau.HoTen if ship.IDChuTau else '',
+                    'ThuyenTruong': ship.IDThuyenTruong.HoTen if ship.IDThuyenTruong else '',
+                    'ViDo': location_data[-1]['ViDo'],
+                    'KinhDo': location_data[-1]['KinhDo'],
+                    'Ngay': location_data[-1]['Ngay']
+                }
 
 
-            return JsonResponse({
-                'message': f'Nhật ký hải trình tàu {ship.SoDangKy}',
-                'status': 200,
-                'location': location_data,
-                'info': info,
-            }, status=200)
+                return JsonResponse({
+                    'message': f'Nhật ký hải trình tàu {ship.SoDangKy}',
+                    'status': 200,
+                    'location': location_data,
+                    'info': info,
+                }, status=200)
+
+            else:
+                return JsonResponse({
+                    'message': f'Không tìm thấy thông tin vị trí!',
+                    'status': 404,
+                }, status=404) 
         
         except json.JSONDecodeError:
             return JsonResponse({
@@ -357,89 +369,3 @@ def get_history_ship_location_api(request):
             'status': 405
         }, status=405)
 
-
-@login_required(login_url='/login/')
-def search_top_10_fishing_api(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-
-        query = data['query']
-        start_date = data['start_date']
-        end_date = data['end_date']
-
-        try:
-            gate = BangCangCa.objects.get(pk=query)
-        except BangCangCa.DoesNotExist:
-            messages.info(request, f"Không tìm thấy thông tin cảng cá với query = '{query}'")
-            return redirect('report-view')
-
-        # ngày về bến nằm trong khoảng start date và end date
-        sea_trip_list = BangChuyenBien.objects.filter(Q(NgayVeBen__gte=start_date) & Q(NgayVeBen__lte=end_date) & Q(CangVeBen=gate))
-        if len(sea_trip_list) == 0:
-            messages.info(request, f"Không tìm thấy chuyến biển về cảng {gate.Ten} trong khoảng thời gian từ {start_date} đến {end_date}")
-            return redirect('report-view')
-        fish_totals = []
-
-        for sea_trip in sea_trip_list:
-            net_list = sea_trip.bangmeluoi_set.all()
-
-            for net in net_list:
-                fish_list = net.bangloaicaduocdanhbattrongmeluoi_set.values('IDLoaiCa__Ten').annotate(tong_san_luong=Sum('SanLuong'))
-
-                fish_totals += fish_list
-        fish_totals.sort(key=lambda x: x['tong_san_luong'], reverse=True)
-        
-        bundles = []
-        for item in fish_totals:
-            data = {
-                'fish_name': item['IDLoaiCa__Ten'],
-                'qty': item['tong_san_luong']
-            }
-            bundles.append(data)
-        
-        return JsonResponse({
-            'message': f'Top 10 loại cá được đánh bắt nhiều nhất trong khoảng thời gian từ {start_date} đến {end_date} ',
-            'status': 200,
-            'bundles': bundles[:10],
-            'start_date': start_date,
-            'end_date': end_date
-        }, status=200)
-
-    else:
-        return JsonResponse({
-            'message': 'method not allowed',
-            'success': False,
-        }, status=405)
-
-
-# Lấy 10 loại cá được đánh bắt nhiều nhất phục vụ cho biểu đồ
-@login_required(login_url='/login/')
-def top_10_fishing_api(request):
-    # Lấy thời điểm 24h trước 
-    time_threshold = timezone.now() - timedelta(hours=24)
-
-    # Lấy danh sách các mẻ lưới có thời gian thu ngư cụ trong khoảng 24h
-    bang_me_luoi_24h = BangMeLuoi.objects.filter(ThoiDiemThuNguCu__lte=time_threshold)
-    # print(bang_me_luoi_24h)
-    # Tính tổng sản lượng của mỗi loại cá được đánh bắt trong 24h
-    top_loai_ca = (
-        BangLoaiCaDuocDanhBatTrongMeLuoi.objects
-        .filter(IDMeLuoi__in=bang_me_luoi_24h)
-        .values('IDLoaiCa__Ten')
-        .annotate(tong_san_luong=Sum('SanLuong'))
-        .order_by('-tong_san_luong')[:10]
-    )
-    # print(top_loai_ca)
-    bundles = []
-    for item in top_loai_ca:
-        data = {
-            'fish_name': item['IDLoaiCa__Ten'],
-            'qty': item['tong_san_luong']
-        }
-        bundles.append(data)
-    # print(bundles)
-    return JsonResponse({
-        'message': 'Top 10 loại cá được đánh bắt nhiều nhất trong 24h qua',
-        'status': 200,
-        'bundles': bundles
-    }, status=200)

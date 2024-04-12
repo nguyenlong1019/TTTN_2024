@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% block title %} Báo cáo thống kê {% endblock title %}
 {% block content %}
 
 {% include 'header.html' with title="Báo cáo thống kê" %}
@@ -110,11 +110,12 @@
                 </tr>
             </thead>
             <tbody>
+                {% with start_number=start_number %}
                 {% for item in items %}
                     {% if forloop.counter|divisibleby:2 %}
                         <tr class="fs-6 bg-info-subtle">
                             <th class="bg-info-subtle text-dark text-center fw-semi" scope="row">
-                                {{forloop.counter}}
+                                {{forloop.counter|add:start_number}}
                             </th>
                             <td class="bg-info-subtle text-dark text-center">
                                 {{item.IDLoaiCa__Ten}}
@@ -126,7 +127,7 @@
                     {% else %}
                         <tr class="fs-6 bg-light">
                             <th class="bg-light text-dark text-center fw-semi" scope="row">
-                                {{forloop.counter}}
+                                {{forloop.counter|add:start_number}}
                             </th>
                             <td class="bg-light text-dark text-center">
                                 {{item.IDLoaiCa__Ten}}
@@ -137,12 +138,54 @@
                         </tr>
                     {% endif %}
                 {% endfor %}
+                {% endwith %}
             </tbody>
         </table>
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center" style="margin-bottom: 0.5rem;">
+                {% if items.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ items.previous_page_number }}">Previous</a></li>
+                {% endif %}
+
+                {% for num in page_range %}
+                    <li class="page-item {% if num == items.number %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endfor %}
+        
+                {% if items.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ items.next_page_number }}">Next</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ items.paginator.num_pages }}">Last &raquo;</a></li>
+                {% endif %}
+            </ul>
+        </nav>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Validation trước khi submit form
+    function validateForm() {
+        let startDate = new Date(document.getElementById('start-date').value);
+        let endDate = new Date(document.getElementById('end-date').value);
+        let today = new Date();
+
+        if (endDate > today) {
+            alert("Ngày kết thúc không được phép là ngày trong tương lai!");
+            return false;
+        }
+
+        if (startDate >= endDate) {
+            alert("Ngày bắt đầu phải nhỏ hơn ngày kết thúc!");
+            return false; 
+        }
+
+        return true;
+    }
+
+</script>
+
 <script>
     const requestData = {
         'query': document.getElementById('search-report-select').value,

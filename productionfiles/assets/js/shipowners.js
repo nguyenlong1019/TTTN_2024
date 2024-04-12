@@ -43,8 +43,7 @@ modalBtns.forEach(modalBtn => modalBtn.addEventListener('click', () => {
     modalBody.innerHTML = `
         <strong>Lưu ý</strong>:
         <ul>
-            <li>Chỉ được phép xóa chủ tàu hoặc thuyền trưởng chưa liên kết với tàu</li>
-            <li>Nếu muốn xóa thông tin chủ tàu hoặc thuyền trưởng đã liên kết, cần xóa tàu trước</li>
+            <li>Xóa chủ tàu hoặc thuyền trưởng đã liên kết tàu có thể gây ra lỗi thông tin tàu</li>
         </ul>
     `;
 
@@ -80,9 +79,10 @@ modalBtns.forEach(modalBtn => modalBtn.addEventListener('click', () => {
             return response.json();
         })
         .then(data => {
-            alert(data.message);
+            // alert(data.message);
             overlayElem.style.display = 'none';
             modalElem.classList.remove('show-modal');
+            window.location.reload();
         })
         .catch(error => {
             console.error('Lỗi:', error);

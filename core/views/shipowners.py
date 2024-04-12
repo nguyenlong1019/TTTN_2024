@@ -19,7 +19,7 @@ def shipowners_view(request):
             captains = []
             shipowners = []
             ships = BangTau.objects.filter(CangCaDangKy=request.user.staff.cangca)
-            if ships is not None:
+            if ships.exists():
                 for ship in ships:
                     if ship.IDChuTau:
                         shipowners.append(ship.IDChuTau)
@@ -29,6 +29,11 @@ def shipowners_view(request):
             shipowners = list(set(shipowners))
             captains = sorted(captains, key=operator.attrgetter('HoTen'))
             shipowners = sorted(shipowners, key=operator.attrgetter('HoTen'))
+            fish_gate = request.user.staff.cangca 
+            city = fish_gate.IDTinh 
+            distric_list = BangDonViHanhChinhCapHuyen.objects.filter(MaTinh=city)
+            shipowners.extend(list(BangChuTau.objects.filter(MaHuyen__in=distric_list).order_by('HoTen')))
+            captains.extend(list(BangThuyenTruong.objects.filter(MaHuyen__in=distric_list).order_by('HoTen'))) 
         else:
             captains = list(BangThuyenTruong.objects.all().order_by('HoTen'))
             shipowners = list(BangChuTau.objects.all().order_by('HoTen'))
@@ -107,7 +112,34 @@ def search_shipowners_view(request):
             shipowners = list(BangChuTau.objects.all())  
 
     elif request.user.user_type == '2':
-        pass
+        fish_gate = request.user.staff.cangca 
+        city = fish_gate.IDTinh 
+        distric_list = BangDonViHanhChinhCapHuyen.objects.filter(MaTinh=city)
+        shipowners = list(BangChuTau.objects.filter(MaHuyen__in=distric_list).order_by('HoTen'))
+        captains = list(BangThuyenTruong.objects.filter(MaHuyen__in=distric_list).order_by('HoTen')) 
+        # print(shipowners)
+        # print(captains)
+        if query_type == '1':
+            shipowners = list(BangChuTau.objects.filter(MaHuyen__in=distric_list).filter(Q(HoTen__icontains=query)).order_by('HoTen'))
+            if len(captains) == 0 and len(shipowners) == 0:
+                messages.info(request, f"Không tìm thấy thông tin họ tên chủ tàu hợp lệ với query='{query}'")
+        elif query_type == '2':
+            captains = list(BangThuyenTruong.objects.filter(MaHuyen__in=distric_list).filter(Q(HoTen__icontains=query)).order_by('HoTen'))
+            if len(captains) == 0 and len(shipowners) == 0:
+                messages.info(request, f"Không tìm thấy thông tin họ tên thuyền trưởng hợp lệ với query='{query}'")
+        elif query_type == '3':
+            captains = list(BangThuyenTruong.objects.filter(MaHuyen__in=distric_list).filter(Q(CMND_CCCD__icontains=query)).order_by('HoTen'))
+            shipowners = list(BangChuTau.objects.filter(MaHuyen__in=distric_list).filter(Q(CMND_CCCD__icontains=query)).order_by('HoTen'))
+            if len(captains) == 0 and len(shipowners) == 0:
+                messages.info(request, f"Không tìm thấy thông tin CMND/CCCD hợp lệ với query='{query}'") 
+        elif query_type == '4':
+            captains = list(BangThuyenTruong.objects.filter(MaHuyen__in=distric_list).filter(Q(DienThoai__icontains=query)).order_by('HoTen'))
+            shipowners = list(BangChuTau.objects.filter(MaHuyen__in=distric_list).filter(Q(DienThoai__icontains=query)).order_by('HoTen'))
+            if len(captains) == 0 and len(shipowners) == 0:
+                messages.info(request, f"Không tìm thấy thông tin số điện thoại hợp lệ với query='{query}'") 
+        else:
+            shipowners = list(BangChuTau.objects.filter(MaHuyen__in=distric_list).order_by('HoTen'))
+            captains = list(BangThuyenTruong.objects.filter(MaHuyen__in=distric_list).order_by('HoTen')) 
     else:
         return render(request, '403.html', {}, status=403)
     
@@ -285,16 +317,15 @@ def delete_shipowners_view(request, pk):
                 }, status=404)
             ship = BangTau.objects.filter(IDThuyenTruong=captain)
             if ship.exists():
-                return JsonResponse({
-                    'message': 'Không được phép xóa thuyền trưởng khi chưa xóa tàu liên kết!!!',
-                    'success': False
-                })
-            else:
-                captain.delete()
-                return JsonResponse({
-                    'message': "Xóa thông tin thuyền trưởng thành công!!!",
-                    'success': True
-                })
+                ship = ship.first()
+                ship.IDThuyenTruong = None 
+                ship.save()
+
+            captain.delete()
+            return JsonResponse({
+                'message': "Xóa thông tin thuyền trưởng thành công!!!",
+                'success': True
+            })
         elif data['userType'] == 'shipowner':
             try:
                 shipowner = BangChuTau.objects.get(pk=pk)
@@ -306,16 +337,15 @@ def delete_shipowners_view(request, pk):
 
             ship = BangTau.objects.filter(IDChuTau=shipowner)
             if ship.exists():
-                return JsonResponse({
-                    'message': 'Không được phép xóa chủ tàu khi chưa xóa tàu liên kết!!!',
-                    'success': False
-                })
-            else:
-                shipowner.delete()
-                return JsonResponse({
-                    'message': "Xóa thông tin chủ tàu thành công!!!",
-                    'success': True
-                })
+                ship = ship.first()
+                ship.IDChuTau = None 
+                ship.save()
+                
+            shipowner.delete()
+            return JsonResponse({
+                'message': "Xóa thông tin chủ tàu thành công!!!",
+                'success': True
+            })
         else:
             return JsonResponse({
                 'message': 'User Type không hợp lệ',

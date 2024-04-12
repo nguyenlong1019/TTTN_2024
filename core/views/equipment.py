@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required 
 from django.db.models import Q 
 from django.contrib import messages
+from django.core.paginator import Paginator
 
 from core.models import * 
 
@@ -87,12 +88,11 @@ def delete_equipment_view(request, pk):
             messages.error(request, f"Không tìm thấy thiết bị với ID = '{pk}'")
             return redirect('index')
         ship = BangTau.objects.filter(IDDevice=equipment)
-        # print(ship)
+        
         if ship.exists():
-            for ship in ships:
-                ship.IDDevice = None 
-                ship.save()
-                print("OKe")
+            ship = ship.first()
+            ship.IDDevice = None 
+            ship.save()
 
         equipment.delete()
         messages.info(request, f"Xóa thiết bị với ID = {pk} thành công!!")
@@ -108,36 +108,46 @@ def search_equipment_view(request):
         query_type = request.GET.get('query-type')
         titles = ["STT", "Serial Number", "Ngày sản xuất", "Version", "Mã tàu", "Trạng thái", "Thao tác"]
 
-        # mã thiết bị
+        # số đăng ký tàu
         if query_type == '1':
-            equipments = BangThietBiNhatKyKhaiThac.objects.filter(Q(IDThietBi__icontains=query)) 
+            ships = BangTau.objects.filter(Q(SoDangKy__icontains=query))
+            equipments = []
+            for ship in ships:
+                if ship.IDDevice is not None:
+                    item = BangThietBiNhatKyKhaiThac.objects.filter(pk=ship.IDDevice.ID)
+                    if item.exists():
+                        equipments.append(item.first())
             if len(list(equipments)) == 0:
-                messages.info(request, f"Không tìm thấy thông tin thiết bị liên quan đến Mã thiết bị với query='{query}'")
+                messages.info(request, f"Không tìm thấy thông tin thiết bị liên quan đến mã tàu với query='{query}'")
+            
         
         # serial number 
         elif query_type == '2':
             equipments = BangThietBiNhatKyKhaiThac.objects.filter(Q(SerialNumber__icontains=query))
             if len(list(equipments)) == 0:
                 messages.info(request, f"Không tìm thấy thông tin thiết bị liên quan đến Serial Number với query='{query}'")
-            
-        # mã tàu
-        # elif query_type == '3':
-        #     ships = BangTau.objects.filter(Q(SoDangKy__icontains=query))
-        #     equipments = []
-        #     for ship in ships:
-        #         # print(ship.IDDevice)
-        #         item = BangThietBiNhatKyKhaiThac.objects.filter(pk=ship.IDDevice.ID)
-        #         equipments.append(item)
-        #     if len(list(equipments)) == 0:
-        #         messages.info(request, f"Không tìm thấy thông tin thiết bị liên quan đến mã tàu với query='{query}'")
-
         else:
             equipments = BangThietBiNhatKyKhaiThac.objects.all().order_by('SerialNumber')
+            if (len(list(equipments))) == 0:
+                messages.info(request, f"Không tìm thấy thông tin thiết bị!!!")
         
-        # print(equipments)
+        items_per_page = 7 
+        p = Paginator(equipments, items_per_page)
+        page = request.GET.get('page')
+        items = p.get_page(page)
+        current = items.number
+        start = max(current - 2, 1)
+        end = min(current + 2, items.paginator.num_pages)
+        page_range = range(start, end)
+        start_number = (current - 1) * items_per_page
+    
         return render(request, 'core/index.html', {
             'titles': titles,
-            'items': equipments
+            'items': items,
+            'start': start, 
+            'end': end, 
+            'page_range': page_range,
+            'start_number': start_number
         }, status=200)
     else:
         return render(request, '403.html', {}, status=403)

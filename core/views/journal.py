@@ -6,6 +6,7 @@ from core.models import *
 from django.db.models import Q
 from django.contrib import messages 
 from django.http import HttpResponse, JsonResponse 
+from django.core.paginator import Paginator
 
 # reportlab lib 
 from reportlab.lib.pagesizes import letter, landscape 
@@ -78,9 +79,24 @@ def journal_view(request):
             if newest_journal is not None:
                 # print(newest_journal)
                 items.append(newest_journal)
+
+        items_per_page = 8
+        p = Paginator(items, items_per_page)
+        page = request.GET.get('page')
+        items = p.get_page(page)
+        current = items.number
+        start = max(current - 2, 1)
+        end = min(current + 2, items.paginator.num_pages)
+        page_range = range(start, end)
+        start_number = (current - 1) * items_per_page
+        
         return render(request, 'core/journal.html', {
             'titles': titles,
             'items': items,
+            'start': start, 
+            'end': end, 
+            'page_range': page_range,
+            'start_number': start_number
         }, status=200)
     else:
         ships = BangTau.objects.filter(Q(CangCaDangKy=request.user.staff.cangca)).order_by('SoDangKy')
@@ -89,9 +105,24 @@ def journal_view(request):
             newest_journal = ship.bangnhatky_set.order_by('-NgayTao').first()
             if newest_journal is not None:
                 items.append(newest_journal)
+        
+        items_per_page = 8
+        p = Paginator(items, items_per_page)
+        page = request.GET.get('page')
+        items = p.get_page(page)
+        current = items.number
+        start = max(current - 2, 1)
+        end = min(current + 2, items.paginator.num_pages)
+        page_range = range(start, end)
+        start_number = (current - 1) * items_per_page
+
         return render(request, 'core/journal.html', {
             'titles': titles,
             'items': items,
+            'start': start, 
+            'end': end, 
+            'page_range': page_range,
+            'start_number': start_number
         }, status=200)
 
 
@@ -191,7 +222,7 @@ def generate_journal_pdf(request, pk):
     flow_obj1.append(Paragraph("NHẬT KÝ KHAI THÁC THỦY SẢN", h2))
     flow_obj1.append(Paragraph(f"NGHỀ CHÍNH: {ediary.IDThietBi.NgheChinh.Ten}.........(**)", h2_normal))
 
-    flow_obj1.append(Paragraph(f"1. Họ và tên chủ tàu: {ediary.IDThietBi.IDChuTau.HoTen}.................; 2. Họ và tên thuyền trưởng: {ediary.IDThietBi.IDThuyenTruong.HoTen}..................", paragraph_normal))
+    flow_obj1.append(Paragraph(f"1. Họ và tên chủ tàu: {ediary.IDThietBi.IDChuTau.HoTen if ediary.IDThietBi.IDChuTau else ''}.................; 2. Họ và tên thuyền trưởng: {ediary.IDThietBi.IDThuyenTruong.HoTen if ediary.IDThietBi.IDThuyenTruong else ''}..................", paragraph_normal))
     flow_obj1.append(Paragraph(f"3. Số đăng ký tàu: {ediary.IDThietBi.SoDangKy}.....; 4. Chiều dài lớn nhất của tàu: {ediary.IDThietBi.ChieuDaiLonNhat} m; 5. Tổng công suất máy chính: {ediary.IDThietBi.CongSuatMay} KW", paragraph_normal))
     flow_obj1.append(Paragraph(f"6. Số Giấy phép khai thác thủy sản: .......................Thời hạn đến: .....................................................", paragraph_normal))
     flow_obj1.append(Paragraph(f"7. Nghề phụ 1: {ediary.IDThietBi.NghePhu1.Ten}..; 8. Nghề phụ 2: .......................................", paragraph_normal))
@@ -300,7 +331,7 @@ def generate_journal_pdf(request, pk):
                 species_totals[species.IDLoaiCa] += species.SanLuong 
         top_6_species = sorted(species_totals.items(), key=lambda x: x[1], reverse=True)[:6]
         top_6_species_name = [BangLoaiCaDanhBat.objects.get(ID=species_id.ID).Ten for species_id, _ in top_6_species]
-
+        # print(top_6_species[0][1])
         
         for net in net_list:
             net_quantities = []
@@ -323,6 +354,7 @@ def generate_journal_pdf(request, pk):
         tmp_ = [i+1, f"{date_start.day}-{date_start.month}-{date_start.year}", f"{str(item.ViDoThaNguCu)[0:7]}", f"{str(item.KinhDoThaNguCu)[0:7]}", f"{date_end.day}-{date_end.month}-{date_end.year}", f"{str(item.ViDoThuNguCu)[0:7]}", f"{str(item.KinhDoThuNguCu)[0:7]}", f"{sum_qty[i][0]}", f"{sum_qty[i][1]}", f"{sum_qty[i][2]}", f"{sum_qty[i][3]}", f"{sum_qty[i][4]}", f"{sum_qty[i][5]}", item.TongSanLuong]
         tmp_list.append(tmp_)
     # print(tmp_list)
+    tmp_list.append(['','','','','','','',top_6_species[0][1],top_6_species[1][1],top_6_species[2][1],top_6_species[3][1],top_6_species[4][1],top_6_species[5][1]])
     top6name = []
     for item in top_6_species_name:
         top6name.append(item.replace(" ", "\n"))
@@ -513,51 +545,119 @@ def generate_journal_pdf(request, pk):
 @login_required(login_url='/login/')
 def search_journal_view(request):
     titles = ["STT", "Mã tàu", "Ngày tạo nhật ký", "Chủ tàu", "CMND (CCCD)", "Mã nhật ký", "Ghi chú", "Thao tác"]
+    query = request.GET.get('q')
+    query_type = request.GET.get('query-type')
+    
+    items = []
     if request.user.user_type == '1' or request.user.is_staff:
-        query = request.GET.get('q')
-        query_type = request.GET.get('query-type')
-        
         # mã tàu
         if query_type == '1':
             ships = BangTau.objects.filter(Q(SoDangKy__icontains=query))
-            items = []
-            for ship in ships:
-                journal_list = ship.bangnhatky_set.all()
-                items.extend(journal_list)
+            # for ship in ships:
+            #     journal_list = ship.bangnhatky_set.all()
+            #     items.extend(journal_list)
+            if ships.exists():
+                items = BangNhatKy.objects.filter(IDThietBi__in=ships).order_by('MaNhatKy')
             if len(items) == 0:
                 messages.info(request, f"Không tìm thấy thông tin nhật ký liên quan đến tàu có số đăng ký query = '{query}'")
 
         # mã chủ tàu
-        if query_type == '2':
-            pass 
+        elif query_type == '2':
+            shipowners = BangChuTau.objects.filter(Q(HoTen__icontains=query))
+            ships = BangTau.objects.filter(IDChuTau__in=shipowners)
+            if ships.exists():
+                items = BangNhatKy.objects.filter(IDThietBi__in=ships).order_by('MaNhatKy') 
+            if len(items) == 0:
+                messages.info(request, f"Không tìm thấy thông tin chủ tàu liên quan với họ tên query = {query}")
 
         # mã thuyền trưởng
-        if query_type == '3':
-            pass 
+        elif query_type == '3':
+            captains = BangThuyenTruong.objects.filter(Q(HoTen__icontains=query))
+            ships = BangTau.objects.filter(IDThuyenTruong__in=captains)
+            if ships.exists():
+                items = BangNhatKy.objects.filter(IDThietBi__in=ships).order_by('MaNhatKy')
+            if len(items) == 0:
+                messages.info(request, f"Không tìm thấy thông tin thuyền trưởng liên quan với họ tên query = {query}")
 
         # mã nhật ký 
-        if query_type == '4':
-            items = BangNhatKy.objects.filter(Q(MaNhatKy__icontains=query))
+        elif query_type == '4':
+            items = BangNhatKy.objects.filter(Q(MaNhatKy__icontains=query)).order_by('MaNhatKy')
             if len(items) == 0:
                 messages.info(request, f"Không tìm thấy thông tin nhật ký với mã query = '{query}'")
+        
+        else:
+            items = BangNhatKy.objects.all().order_by('MaNhatKy')
 
         # mã chuyến biển
-        if query_type == '5':
-            tmp = BangChuyenBien.objects.filter(Q(ID__icontains=query) | Q(ChuyenBienSo__icontains=query))
-            items = []
-            for i in tmp:
-                journal_list = i.bangnhatky_set.all()
-                items.extend(journal_list) 
-            print(len(items))
-            if len(items) == 0:
-                messages.info(request, f"Không tìm thấy thông tin nhật ký liên quan đến chuyển biến với query = '{query}'")  
+        # if query_type == '5':
+        #     tmp = BangChuyenBien.objects.filter(Q(ID__icontains=query) | Q(ChuyenBienSo__icontains=query))
+        #     items = []
+        #     for i in tmp:
+        #         journal_list = i.bangnhatky_set.all()
+        #         items.extend(journal_list) 
+        #     print(len(items))
+        #     if len(items) == 0:
+        #         messages.info(request, f"Không tìm thấy thông tin nhật ký liên quan đến chuyển biến với query = '{query}'")  
 
-        return render(request, 'core/journal.html', {
-            'titles': titles,
-            'items': items,
-        }, status=200)
+
+        # return render(request, 'core/journal.html', {
+        #     'titles': titles,
+        #     'items': items,
+        # }, status=200)
 
     elif request.user.user_type == '2':
-        pass
+        # mã chủ tàu
+        if query_type == '2':
+            shipowners = BangChuTau.objects.filter(Q(HoTen__icontains=query))
+            ships = BangTau.objects.filter(IDChuTau__in=shipowners).filter(CangCaDangKy=request.user.staff.cangca)
+            if ships.exists():
+                items = BangNhatKy.objects.filter(IDThietBi__in=ships).order_by('MaNhatKy') 
+            if len(items) == 0:
+                messages.info(request, f"Không tìm thấy thông tin chủ tàu liên quan với họ tên query = {query}")
+
+        # mã thuyền trưởng
+        elif query_type == '3':
+            captains = BangThuyenTruong.objects.filter(Q(HoTen__icontains=query))
+            ships = BangTau.objects.filter(IDThuyenTruong__in=captains).filter(CangCaDangKy=request.user.staff.cangca)
+            if ships.exists():
+                items = BangNhatKy.objects.filter(IDThietBi__in=ships).order_by('MaNhatKy')
+            if len(items) == 0:
+                messages.info(request, f"Không tìm thấy thông tin thuyền trưởng liên quan với họ tên query = {query}")
+
+        # mã nhật ký 
+        elif query_type == '4':
+            ships = BangTau.objects.filter(CangCaDangKy=request.user.staff.cangca)
+            if ships.exists():
+                items = BangNhatKy.objects.filter(IDThietBi__in=ships).filter(Q(MaNhatKy__icontains=query)).order_by('MaNhatKy')
+            if len(items) == 0:
+                messages.info(request, f"Không tìm thấy thông tin nhật ký với mã query = '{query}'")
+        
+        else:
+            items = BangNhatKy.objects.all().order_by('MaNhatKy')
+
+        # return render(request, 'core/journal.html', {
+        #     'titles': titles,
+        #     'items': items,
+        # }, status=200)
+
     else:
         return render(request, '403.html', {}, status=403)
+
+    items_per_page = 8
+    p = Paginator(items, items_per_page)
+    page = request.GET.get('page')
+    items = p.get_page(page)
+    current = items.number
+    start = max(current - 2, 1)
+    end = min(current + 2, items.paginator.num_pages)
+    page_range = range(start, end)
+    start_number = (current - 1) * items_per_page
+
+    return render(request, 'core/journal.html', {
+        'titles': titles,
+        'items': items,
+        'start': start, 
+        'end': end, 
+        'page_range': page_range,
+        'start_number': start_number
+    }, status=200)

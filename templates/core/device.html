@@ -132,7 +132,13 @@
                                 {% if request.user.user_type == '1' or request.user.is_staff %}
                                 {{item.SoDangKy}}
                                 {% else %}
-                                ********
+                                
+                                    {% if item.is_anchor %}
+                                    {{item.SoDangKy}}
+                                    {% else %}
+                                    ********
+                                    {% endif %}
+
                                 {% endif %}
                             </td>
                             <td class="bg-info-subtle text-dark text-center">
@@ -177,7 +183,13 @@
                                 {% if request.user.user_type == '1' or request.user.is_staff %}
                                 {{item.SoDangKy}}
                                 {% else %}
-                                ********
+                                
+                                    {% if item.is_anchor %}
+                                    {{item.SoDangKy}}
+                                    {% else %}
+                                    ********
+                                    {% endif %}
+
                                 {% endif %}
                             </td>
                             <td class="bg-light text-dark text-center">

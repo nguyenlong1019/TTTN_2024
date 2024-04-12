@@ -442,9 +442,9 @@ class BangTau(models.Model):
         related_name='cangcadangky',
         to=BangCangCa,
         on_delete=models.DO_NOTHING,
-        editable=False,
         null=False,
-        default=1
+        default=1,
+        help_text='Cảng cá đăng ký'
     )
     
     CangCaPhu = models.ForeignKey(
@@ -551,7 +551,7 @@ class BangTau(models.Model):
         verbose_name_plural = "Bảng tàu"
 
     def __str__(self):
-        return f"{self.ID}-{self.SoDangKy}-{self.IDChuTau.HoTen}-{self.CangCaDangKy.Ten}"
+        return f"{self.ID}-{self.SoDangKy}-{self.CangCaDangKy.Ten}"
 
 
 class BangLoaiCaDanhBat(models.Model):
@@ -722,7 +722,7 @@ class BangChuyenBien(models.Model):
         verbose_name_plural = "Bảng chuyến biển"
 
     def __str__(self):
-        return f"{self.ID}-{self.IDTau.SoDangKy}-Chuyến biển: {self.ChuyenBienSo}-Khối lượng: {self.KhoiLuongChuyenTai}"
+        return f"{self.ID}-{self.IDTau.SoDangKy}-Chuyến biển: {self.ChuyenBienSo}-Khối lượng: {self.KhoiLuongDanhBat}"
 
 
 class BangMeLuoi(models.Model):

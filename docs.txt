@@ -157,5 +157,9 @@ Report sẽ là phần view cần cố định height và sửa lại thông tin
 # Cần thêm else xử lý số đăng ký chưa được cập nhật (haizz bug mới)
 
 
-Đối với user level 3: Oke phần index, add và edit còn phần search phân trang và 
-phần xóa cần thêm vài thiết bị và liên kết đến tàu để test :)
+Bug kết quả search chưa phân trang :(( bug này còn lâu mới fix được
+thêm query nữa :)
+
+Bug phần xử lý search khi mã ngày trong tương lại cũng được 
+Bug về height  
+Lỗi search phân trang

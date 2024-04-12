@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %} Báo cáo thống kê {% endblock title %}
 {% block content %}
 
 {% include 'header.html' with title="Báo cáo thống kê" %}
@@ -16,7 +17,7 @@
 
 {% endif %}
 
-<form action="{% url 'report-search' %}" method="GET">
+<form action="{% url 'report-search' %}" method="GET" onsubmit="return validateForm()">
     <div class="row bg-info-subtle mt-2 pt-2 fs-6 fw-bolder rounded-top">
         <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
             <label for="search-report-select" class="form-label">Bộ lọc</label>
@@ -41,10 +42,10 @@
             </select>
         </div>
         <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
-            <input type="date" value="2020-01-01" class="form-control col" name="start-date">
+            <input type="date" value="2020-01-01" class="form-control col" name="start-date" id="start-date-report">
         </div>
         <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 col-xxl-2">
-            <input type="date" value="2024-01-01" class="form-control col" name="end-date">
+            <input type="date" value="2024-01-01" class="form-control col" name="end-date" id="end-date-report">
         </div>
         <div class="col-1 col-sm-2 col-md-1 col-lg-1 col-xl-1 col-xxl-1" style="width: max-content;">
             <button type="submit" class="btn btn-dark rounded">
@@ -61,11 +62,11 @@
     </div>
 </form>
 
-<div class="row bg-info-subtle rounded p-2 mt-2 fs-6" style="height: 75vh;overflow-y: auto;">
-    <div class="col-3 text-white rounded p-3" style="background-color: #5F5D9C;height: 100%;overflow-y: auto;">
+<div class="row bg-info-subtle rounded p-2 mt-2 fs-6" style="height: 75vh;overflow-y: hidden;">
+    <div class="col-3 text-white rounded p-3" style="background-color: #5F5D9C;height: 100%;">
         <strong>Thông tin cơ bản trong 24h qua</strong>
         {% if request.user.user_type == '1' or request.user.is_staff %}
-        <div>
+        <!-- <div>
             <strong>Cảng cá: Quy Nhơn</strong>
             <ul class="mt-2 fs-6">
                 <li>Tàu vào: 512 tàu cập cảng</li>
@@ -73,8 +74,8 @@
                 <li>Tổng khối lượng chuyển tải: 756 tấn cá</li>
                 <li>Loài cá được đánh bắt nhiều nhất: Cá ngừ vây vàng</li>
             </ul>
-        </div>
-        <div>
+        </div> -->
+        <!-- <div>
             <strong>Cảng cá: Đề Gi</strong>
             <ul class="mt-2 fs-6">
                 <li>Tàu vào: 512 tàu cập cảng</li>
@@ -82,14 +83,15 @@
                 <li>Tổng khối lượng chuyển tải: 756 tấn cá</li>
                 <li>Loài cá được đánh bắt nhiều nhất: Cá ngừ vây vàng</li>
             </ul>
-        </div>
+        </div> -->
         <div>
-            <strong>Cảng cá: Tam Quan</strong>
+            <strong>Toàn bộ cảng cá: </strong>
             <ul class="mt-2 fs-6">
-                <li>Tàu vào: 512 tàu cập cảng</li>
-                <li>Tàu ra: 123 tàu xuất bến</li>
-                <li>Tổng khối lượng chuyển tải: 756 tấn cá</li>
-                <li>Loài cá được đánh bắt nhiều nhất: Cá ngừ vây vàng</li>
+                <li>Tổng số tàu: {{total_ship}}</li>
+                <li>Tàu vào: {{total_ship_anchor}} tàu cập cảng</li>
+                <li>Tàu ra: {{total_ship_active}} tàu xuất bến</li>
+                <li>Tổng khối lượng chuyển tải: {{total_qty}} kg cá</li>
+                <!-- <li>Loài cá được đánh bắt nhiều nhất: Cá ngừ vây vàng</li> -->
             </ul>
         </div>
         {% endif %}
@@ -109,9 +111,9 @@
     <div class="col-5" style="height: 100%;">
         <canvas id="reportChart" style="width: 100%;height: 100%;"></canvas>
     </div>
-    <div class="col-4" style="height: 100%;overflow-y: auto;">
+    <div class="col-4" style="height: 100%;">
         <table class="table table-hover shadow" style="overflow-y: auto;">
-            <caption class="text-center caption-top fw-bolder">Danh sách các loại cá đánh bắt được trong 24h</caption>
+            <caption class="text-center caption-top fw-bolder">Tổng sản lượng các loại cá đánh bắt được trong 24h</caption>
             <thead>
                 <tr>
                     {% for title in titles %}
@@ -122,11 +124,12 @@
                 </tr>
             </thead>
             <tbody>
+                {% with start_number=start_number %}
                 {% for item in items %}
                     {% if forloop.counter|divisibleby:2 %}
                         <tr class="fs-6 bg-info-subtle">
                             <th class="bg-info-subtle text-dark text-center fw-semi" scope="row">
-                                {{forloop.counter}}
+                                {{forloop.counter|add:start_number}}
                             </th>
                             <td class="bg-info-subtle text-dark text-center">
                                 {{item.IDLoaiCa__Ten}}
@@ -138,7 +141,7 @@
                     {% else %}
                         <tr class="fs-6 bg-light">
                             <th class="bg-light text-dark text-center fw-semi" scope="row">
-                                {{forloop.counter}}
+                                {{forloop.counter|add:start_number}}
                             </th>
                             <td class="bg-light text-dark text-center">
                                 {{item.IDLoaiCa__Ten}}
@@ -149,12 +152,54 @@
                         </tr>
                     {% endif %}
                 {% endfor %}
+                {% endwith %}
             </tbody>
         </table>
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center" style="margin-bottom: 0.5rem;">
+                {% if items.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ items.previous_page_number }}">Previous</a></li>
+                {% endif %}
+
+                {% for num in page_range %}
+                    <li class="page-item {% if num == items.number %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endfor %}
+        
+                {% if items.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ items.next_page_number }}">Next</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ items.paginator.num_pages }}">Last &raquo;</a></li>
+                {% endif %}
+            </ul>
+        </nav>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Validation trước khi submit form
+    function validateForm() {
+        let startDate = new Date(document.getElementById('start-date-report').value);
+        let endDate = new Date(document.getElementById('end-date-report').value);
+        let today = new Date();
+
+        if (endDate > today) {
+            alert("Ngày kết thúc không được phép là ngày trong tương lai!");
+            return false;
+        }
+
+        if (startDate >= endDate) {
+            alert("Ngày bắt đầu phải nhỏ hơn ngày kết thúc!");
+            return false; 
+        }
+
+        return true;
+    }
+
+</script>
+
 <script>
     const urlOrigin = window.location.origin;
     fetch(`${urlOrigin}/report/top-10-fishing-qty-on-24h/`)
